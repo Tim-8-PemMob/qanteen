@@ -1,60 +1,46 @@
-import 'dart:convert';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/menu.dart';
-import 'package:qanteen/stand_model.dart';
+import 'package:qanteen/model/stand_model.dart';
+import 'addStand.dart';
 
 
-Future<List<StandModel>> getStand() async {
-  DataSnapshot standSnap = await FirebaseDatabase.instance.ref().child("Stand").get();
+Future<List<StandModel>> getStandFireStore() async {
   var listStand = List<StandModel>.empty(growable: true);
-  var standDecode = jsonDecode(jsonEncode(standSnap.value));
-
-  print(standDecode["Stand-1"]["name"]);
-
-  for(int i = 1; i <= standDecode.length; i++) {
-    StandModel stand = StandModel(name: standDecode["Stand-${i}"]["name"]);
-    listStand.add(stand);
-  }
-
+  await FirebaseFirestore.instance.collection("Stands").get().then((data) {
+    for (var doc in data.docs) {
+      StandModel standModel = StandModel(id: doc.id.toString(), name: doc.data()["name"]);
+      listStand.add(standModel);
+    }
+  });
   return listStand;
 }
 
-void addMenu() async {
-  DatabaseReference dataRef = FirebaseDatabase.instance.ref('Menu');
-  await dataRef.update({
-    "10" : "Ayam Geprek",
-  });
+class Index extends StatefulWidget {
+  @override
+  _Index createState() => _Index();
 }
 
-// Future<DatabaseReference> reference() async {
-//   DatabaseReference restoRef = FirebaseDatabase.instance.ref("Menu");
-//   restoRef.onValue.listen((DatabaseEvent event) {
-//     final data = event.snapshot.value;
-//     print("data : " + data.toString());
-//     print("new data, data type ${data.runtimeType}");
-//   });
-//   return restoRef;
-// }
-
-class Index extends StatelessWidget {
+class _Index extends State<Index> {
 
   @override
   Widget build(BuildContext context) {
+    getStandFireStore();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Stand Makanan"),
       ),
       body: FutureBuilder(
-        future: getStand(),
+        future: getStandFireStore(),
         builder: (context, snapshot) {
+          var data = snapshot.data;
           if (snapshot.hasError) {
             return Text(snapshot.error.toString());
-          } else if (snapshot.hasData) {
+          } else if (data != null) {
             // reference();
-            addMenu();
+            // addMenu();
             return ListView.builder(
-                itemCount: snapshot.data!.length,
+                itemCount: data.length,
                 itemBuilder: (context, index) {
                   return Card(
                     elevation: 3,
@@ -66,14 +52,14 @@ class Index extends StatelessWidget {
                       ),
                       child: InkWell(
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Menu(standNumb : "Stand-${index + 1}")));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Menu(standId : data[index].id)));
                           },
                           child: SizedBox (
                               height: 80,
                               child: Center (
                                   child : ListTile(
-                                    leading: Icon(Icons.food_bank),
-                                    title: Text("Stand : ${snapshot.data![index].name.toString()}"),
+                                    leading: const Icon(Icons.food_bank),
+                                    title: Text("Stand : ${data[index].name.toString()}"),
                                   )
                               )
                           )
@@ -82,10 +68,21 @@ class Index extends StatelessWidget {
             }
             );
           } else {
-            return CircularProgressIndicator();
+            return const Center(
+                child: CircularProgressIndicator()
+            );
           }
         },
-      )
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed:() {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AddStand())).then((msg) => setState(() {
+              var snackBar = SnackBar(content: Text(msg));
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }));
+          },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

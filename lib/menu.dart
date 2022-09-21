@@ -1,82 +1,139 @@
-import 'dart:convert';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'menu_model.dart';
+import 'package:qanteen/addMenu.dart';
+import 'package:qanteen/editMenu.dart';
+import 'model/menu_model.dart';
 
-class Menu extends StatelessWidget {
+class Menu extends StatefulWidget {
+  final String standId;
 
-  final String standNumb;
+  Menu({required this.standId});
+  @override
+  _Menu createState() => _Menu(standId: standId);
+}
 
-  Menu({required this.standNumb});
+class _Menu extends State<Menu> {
+  final String standId;
 
-  Future<List<MenuModel>> dataMenu() async {
-    DataSnapshot menuSnap = await FirebaseDatabase.instance.ref().child("Stand/${standNumb}/Menu").get();
-    print("Stand numb : ${standNumb}");
-    print("List Menu : ${menuSnap.value}");
-    var listMenu = List<MenuModel>.empty(growable: true);
-    var menu = menuSnap.value;
-    print("Data Type : ${menu.runtimeType}");
-    var y = jsonDecode(jsonEncode(menu));
-    print("length : ${y.length}");
+  _Menu({required this.standId});
 
-    var data = jsonDecode(jsonEncode(menu));
-    print("work ? : ${data["menu-1"]}");
-    for(int i = 1; i <= data.length; i++) {
-      MenuModel menu = MenuModel(name: data["menu-${i}"]["name"], price: data["menu-${i}"]["price"]);
-      listMenu.add(menu);
+  Future<List<MenuModel>> getMenuFireStore(String standId) async {
+    var listStand = List<MenuModel>.empty(growable: true);
+    await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").get().then((data) {
+      for (var doc in data.docs) {
+        print("name : ${doc.data()['name']}");
+        print("price : ${doc.data()['price']}");
+        MenuModel menuModel = MenuModel(id: doc.id.toString(), name: doc.data()["name"], price: doc.data()['price'], imgUrl: doc.data()['image']);
+        listStand.add(menuModel);
+      }
+    });
+    return listStand;
+  }
+
+  Future<String> deleteMenu(String standId, String menuId) async {
+    late String message;
+    try {
+      await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).delete().then((msg) {
+        message = "Menu Berhasil di Hapus";
+      }, onError: (e) {
+        message = "Terjadi Masalah : ${e}";
+      });
+    } catch(e) {
+      message = "Terjadi Masalah : ${e}";
     }
-    // data.forEach((key, data) {
-    //   listMenu.add(data);
-    // });
-
-    print("listMenu : ${listMenu[0].name}");
-
-    return listMenu;
+    return message;
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Menu"),),
-      body: FutureBuilder(
-        future: dataMenu(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          } else if (snapshot.hasData) {
-            return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.outline,
+        appBar: AppBar(
+          title: Text("Menu"),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddMenu(
+                              standId: standId,
+                            ))).then((msg) => setState(() {
+                  var snackBar = SnackBar(content: Text(msg));
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }));
+              },
+              icon: const Icon(Icons.restaurant_menu),
+            )
+          ],
+        ),
+        body: FutureBuilder(
+          future: getMenuFireStore(standId),
+          builder: (context, snapshot) {
+            var data = snapshot.data;
+            if (snapshot.hasError) {
+              return Text("Error : ${snapshot.error.toString()}");
+            } else if (data != null && data.isNotEmpty) {
+              return ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
                         ),
-                        borderRadius: const BorderRadius.all(Radius.circular(12)),
-                      ),
-                      child: InkWell(
-                          onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Menu(standNumb : "Stand-${index + 1}")));
-                          },
-                          child: SizedBox (
-                              height: 80,
-                              child: Center (
-                                  child : ListTile(
-                                    leading: Icon(Icons.restaurant_menu),
-                                    title: Text(snapshot.data![index].name.toString()),
-                                    subtitle: Text("Rp. ${snapshot.data![index].price.toString()}"),
-                                  )
-                              )
-                          )
-                      )
-                  );
-                }
-            );
-          } else {
-            return CircularProgressIndicator();
-          }
-        },
-      )
-    );
+                        child: InkWell(
+                            child: SizedBox(
+                                height: 80,
+                                child: Center(
+                                    child: ListTile(
+                                        leading: Image.network(
+                                            data[index].imgUrl),
+                                        title: Text(
+                                            data[index].name.toString()),
+                                        subtitle: Text(
+                                            "Rp. ${data[index].price.toString()}"),
+                                        trailing: PopupMenuButton<int>(
+                                            onSelected: (value) {
+                                              if (value == 1) {
+                                                Navigator.push(context, MaterialPageRoute(builder: (builder) => EditMenu(standId: standId, menuId: data[index].id))).then(
+                                                        (msg) => setState(() {
+                                                          var snackBar = SnackBar(content: Text(msg));
+                                                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                        })
+                                                );
+                                              } else if (value == 2) {
+                                                setState(() {
+                                                  deleteMenu(standId, data[index].id).then((msg) {
+                                                    var snackBar = SnackBar(content: Text(msg));
+                                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                  });
+                                                });
+                                              }
+                                            },
+                                          itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+                                            const PopupMenuItem<int>(
+                                                value: 1,
+                                                child: const Text("Edit")),
+                                            const PopupMenuItem<int>(
+                                                value: 2,
+                                                child: const Text("Delete")),
+                                          ]),
+                                      ),
+                                    ))));
+                  });
+            } else if (snapshot.connectionState == ConnectionState.waiting){
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return const Center(
+                child: Text("Tidak Ada Menu"),
+              );
+            }
+          },
+        ));
   }
 }
