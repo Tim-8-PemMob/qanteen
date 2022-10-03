@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:qanteen/landing.dart';
+import 'package:qanteen/pages/landing.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,9 +1,36 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:login_signup/login.dart';
+import 'package:qanteen/pages/addStand.dart';
+import 'package:qanteen/pages/login.dart';
 
-class SignUpPage extends StatelessWidget {
-  const SignUpPage({super.key});
+Future<void> signUp(String name, String email, String password, String confirmPassword) async {
+  try {
+    if (password == confirmPassword) {
+      UserCredential user = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+      print("data user : ${user}");
+      print("data user.user ${user.user}");
+      await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).set({
+        "name" : name,
+      });
+    }
+  } catch(e) {
+    print(e);
+  }
+}
+
+class SignUpPage extends StatefulWidget {
+  @override
+  _SignUpPage createState() => _SignUpPage();
+}
+
+class _SignUpPage extends State<SignUpPage> {
+
+  TextEditingController tName = TextEditingController(text: "");
+  TextEditingController tEmail = TextEditingController(text: "");
+  TextEditingController tPassword = TextEditingController(text: "");
+  TextEditingController tConfirm = TextEditingController(text: "");
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +81,10 @@ class SignUpPage extends StatelessWidget {
               ),
               Column(
                 children: <Widget>[
-                  inputFile(label: "Nama Lengkap"),
-                  inputFile(label: "Email"),
-                  inputFile(label: "Password", obscureText: true),
-                  inputFile(label: "Konfirmasi Password", obscureText: true),
+                  inputFile(label: "Nama Lengkap", textEditingController:  tName),
+                  inputFile(label: "Email", textEditingController: tEmail),
+                  inputFile(label: "Password", textEditingController: tPassword,obscureText: true),
+                  inputFile(label: "Konfirmasi Password", textEditingController: tConfirm ,obscureText: true),
                 ],
               ),
               Container(
@@ -74,7 +101,9 @@ class SignUpPage extends StatelessWidget {
                 child: MaterialButton(
                   minWidth: double.infinity,
                   height: 60,
-                  onPressed: () {},
+                  onPressed: () {
+                    signUp(tName.text ,tEmail.text, tPassword.text, tConfirm.text);
+                  },
                   color: Color(0xff0095FF),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
@@ -114,7 +143,7 @@ class SignUpPage extends StatelessWidget {
   }
 }
 
-Widget inputFile({label, obscureText = false}) {
+Widget inputFile({label, obscureText = false, required TextEditingController textEditingController}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
@@ -127,6 +156,7 @@ Widget inputFile({label, obscureText = false}) {
         height: 5,
       ),
       TextField(
+        controller: textEditingController,
         obscureText: obscureText,
         decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),

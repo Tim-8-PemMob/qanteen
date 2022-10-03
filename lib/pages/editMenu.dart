@@ -26,7 +26,7 @@ class _EditMenu extends State<EditMenu> {
   final ImagePicker imagePicker = ImagePicker();
   File? image;
   String oldImage = "";
-  late String oldImgName;
+  String oldImgName = "";
 
   Future getImagePath() async {
     final pickedImg = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -38,13 +38,13 @@ class _EditMenu extends State<EditMenu> {
     });
   }
 
-  Future<String> fileUpload(File imgPath, String standId, String menuName, String oldName) async {
-    await deleteFile(standId, oldName);
+  Future<String> fileUpload(File imgPath, String standId, String menuId) async {
+    await deleteFile(standId, menuId);
 
     final storageRef = FirebaseStorage.instance.ref();
 
     // rename image name
-    final imgRef = storageRef.child("${standId}/${menuName}");
+    final imgRef = storageRef.child("${standId}/${menuId}");
     try {
       await imgRef.putFile(imgPath);
     } on FirebaseException catch (e) {
@@ -53,10 +53,10 @@ class _EditMenu extends State<EditMenu> {
     return imgRef.getDownloadURL();
   }
 
-  Future deleteFile(String standId, String menuName) async {
+  Future deleteFile(String standId, String menuId) async {
     final storageRef = FirebaseStorage.instance.ref();
     
-    final imgDelete = storageRef.child("${standId}/${menuName}");
+    final imgDelete = storageRef.child("${standId}/${menuId}");
     await imgDelete.delete().then((msg) {
       print("Berhasil");
     }, onError: (e) {
@@ -64,6 +64,7 @@ class _EditMenu extends State<EditMenu> {
     });
   }
 
+  // jika ganti nama tanpa ganti gambar nantinya saat ganti gambar maka gambar lama tidak terhapus
   Future getMenuById(String standId, String menuId) async {
     await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get().then((data) {
       var menu = data.data();
@@ -72,24 +73,41 @@ class _EditMenu extends State<EditMenu> {
           tName = TextEditingController(text: menu['name'].toString());
           tPrice = TextEditingController(text: menu['price'].toString());
           oldImage = menu['image'];
-          oldImgName = menu['name'];
         });
       }
     });
   }
 
-  Future<String> editMenu(File? image, String standId, String oldImage) async {
+  Future<String> editMenu(File? image, String standId, String oldImageURL, String menuId) async {
+    // jika gambar di ganti : upload gambar terlebih dahulu lalu ambil urlnya dan dimasukkan ke dalam db
     late String message;
     print("image null ?? : ${image}");
-    await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).update({
-      "name" : tName.text,
-      "price" : int.parse(tPrice.text),
-      "image" : (image != null) ? await fileUpload(image, standId, tName.text ,oldImage) : oldImage,
-    }).then((msg) {
-      message = "Menu Berhasil di Edit";
-    }, onError: (e) {
-      message = "Terjadi Error : ${e}";
-    });
+    print("old image : ${oldImage}");
+
+    if (oldImageURL == "") {
+      await fileUpload(image!, standId, menuId).then((url) {
+        FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).update({
+          "name" : tName.text,
+          "price" : int.parse(tPrice.text),
+          // edit supaya jika ganti nama tanpa ganti gambar maka akan mengganti nama gambar juga
+          "image" : url,
+        });
+        message = "Menu Berhasil di Edit";
+      }, onError: (e) {
+        message = "Terjadi Error : ${e}";
+      });
+    } else {
+      await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).update({
+        "name" : tName.text,
+        "price" : int.parse(tPrice.text),
+        // edit supaya jika ganti nama tanpa ganti gambar maka akan mengganti nama gambar juga
+        "image" : oldImageURL,
+      }).then((msg) {
+        message = "Menu Berhasil di Edit";
+      }, onError: (e) {
+        message = "Terjadi Error : ${e}";
+      });
+    }
     return message;
   }
 
@@ -144,7 +162,7 @@ class _EditMenu extends State<EditMenu> {
                     ),
                     TextButton(
                         onPressed: () {
-                          editMenu(img, standId, oldImgName).then((msg) {
+                          editMenu(img, standId, oldImage, menuId).then((msg) {
                             var snackBar = SnackBar(content: Text(msg));
                             if (msg == "Menu Berhasil di Edit") {
                               Navigator.pop(context, msg);

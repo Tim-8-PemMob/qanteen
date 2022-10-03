@@ -1,9 +1,37 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:login_signup/signup.dart';
+import 'package:qanteen/pages/addStand.dart';
+import 'package:qanteen/pages/index.dart';
+import 'package:qanteen/pages/signup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+Future<dynamic> signIn(String email, String password) async {
+  try {
+    UserCredential user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+    final userData = await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).get();
+    var data = jsonDecode(jsonEncode(userData.data()));
+    print("user data : ${data.runtimeType}");
+    print(data["name"]);
+    print("user : ${user.user}");
+    return data;
+  } catch (e) {
+    print(e);
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPage createState() => _LoginPage();
+}
+
+class _LoginPage extends State<LoginPage> {
+
+  TextEditingController tEmail = TextEditingController(text: "");
+  TextEditingController tPassword = TextEditingController(text: "");
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +84,8 @@ class LoginPage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
                     children: [
-                      inputFile(label: "Email"),
-                      inputFile(label: "Password", obscureText: true)
+                      inputFile(label: "Email", textEditingController: tEmail),
+                      inputFile(label: "Password", textEditingController: tPassword ,obscureText: true)
                     ],
                   ),
                 ),
@@ -77,7 +105,21 @@ class LoginPage extends StatelessWidget {
                     child: MaterialButton(
                       minWidth: double.infinity,
                       height: 60,
-                      onPressed: () {},
+                      onPressed: () {
+                        signIn(tEmail.text, tPassword.text).then((res) {
+                          if (res != null) {
+                            if (res['role'] == "user") {
+                              // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => Index()));
+                            } else if (res['role'] == 'seller') {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => AddStand()));
+                            }
+                          } else {
+                            var snackBar = SnackBar(content: Text("Mohon Periksa Lagi User dan Email Anda"));
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          }
+                        });
+                      },
                       color: Color(0xff0095FF),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -131,7 +173,7 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-Widget inputFile({label, obscureText = false}) {
+Widget inputFile({label, obscureText = false, required TextEditingController textEditingController}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
@@ -144,6 +186,7 @@ Widget inputFile({label, obscureText = false}) {
         height: 5,
       ),
       TextField(
+        controller: textEditingController,
         obscureText: obscureText,
         decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),

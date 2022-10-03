@@ -34,29 +34,34 @@ class _AddMenu extends State<AddMenu> {
     });
   }
 
-  Future<String> fileUpload(File imgPath, String standId, String menuName) async {
+  Future<String> fileUpload(File imgPath, String standId, String menuId) async {
     final storageRef = FirebaseStorage.instance.ref();
-
-    // rename image name
-    final imgRef = storageRef.child("${standId}/${menuName}");
+    late String downloadUrl;
+    final imgRef = storageRef.child("${standId}/${menuId}");
     try {
       await imgRef.putFile(imgPath);
-    } on FirebaseException catch (e) {
-      print(e);
+      downloadUrl = await imgRef.getDownloadURL();
+    } catch (e) {
+      print("error : ${e}");
     }
-    return imgRef.getDownloadURL();
+    return downloadUrl;
   }
 
   Future<String> inputMenu(String standId, File imgPath) async {
     late String message;
     await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").add({
-      "image" : await fileUpload(imgPath, standId, tName.text.toString()),
+      "image" : "placeholder",
       "name" : tName.text.toString(),
       "price" : int.parse(tPrice.text),
-    }).then((mes) {
-      message = "Menu Berhasil di Tambahkan";
-    }, onError: (e) {
-      message = "Terjadi Error : ${e}";
+    }).then((res) async {
+      await fileUpload(imgPath, standId, res.id).then((url) async {
+        await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(res.id).update({
+          "image" : url
+        });
+        message = "Menu Berhasil di Tambahkan";
+      }, onError: (e) {
+        message = "Terjadi Error : ${e}";
+      });
     });
     return message;
   }
@@ -97,14 +102,19 @@ class _AddMenu extends State<AddMenu> {
                     ),
                     TextButton(
                         onPressed: () async {
-                          inputMenu(standId, image!).then((msg) {
-                            var snackBar = SnackBar(content: Text(msg));
-                            if (msg == "Menu Berhasil di Tambahkan") {
-                              Navigator.pop(context, msg);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                            }
-                          });
+                          if (tName.text.isNotEmpty && tPrice.text.isNotEmpty && image != null){
+                            inputMenu(standId, image!).then((msg) {
+                              var snackBar = SnackBar(content: Text(msg));
+                              if (msg == "Menu Berhasil di Tambahkan") {
+                                Navigator.pop(context, msg);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              }
+                            });
+                          } else {
+                            var snackBar = SnackBar(content: Text("Tolong Masukkan Data Dengan Benar"));
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          }
                         },
                         child: const Text("Input Menu")
                     )

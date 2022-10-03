@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,11 +20,15 @@ Future<String> addStand() async {
   return message;
 }
 
-class AddStand extends StatelessWidget {
+class AddStand extends StatefulWidget {
+  @override
+  _AddStand createState() => _AddStand();
+}
+
+class _AddStand extends State<AddStand> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create Stand"),
@@ -38,19 +41,27 @@ class AddStand extends StatelessWidget {
                   children: [
                     TextField(
                       controller: tName,
-                      decoration: const InputDecoration(
-                          hintText: "Nama Stand"
+                      decoration: InputDecoration(
+                          hintText: "Nama Stand",
                       ),
                     ),
                     TextButton(
-                        onPressed: () async => addStand().then((msg) {
-                          var snackBar = SnackBar(content: Text(msg));
-                          if (msg == "Stand Anda Berhasil Ditambahkan") {
-                            Navigator.pop(context, msg);
+                        onPressed: () {
+                          if (tName.text.isNotEmpty) {
+                            addStand().then((msg) {
+                              var snackBar = SnackBar(content: Text(msg));
+                              if (msg == "Stand Anda Berhasil Ditambahkan") {
+                                Navigator.pop(context, msg);
+                                tName = TextEditingController(text: "");
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              }
+                            });
                           } else {
+                            var snackBar = SnackBar(content: Text("Tolong Masukkan Data Dengan Benar"));
                             ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           }
-                        }),
+                        },
                         child: const Text("Input Menu")
                     )
                   ],

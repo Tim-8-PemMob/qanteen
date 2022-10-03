@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:qanteen/addMenu.dart';
-import 'package:qanteen/editMenu.dart';
-import 'model/menu_model.dart';
+import 'package:qanteen/pages/addMenu.dart';
+import 'package:qanteen/pages/cart.dart';
+import 'package:qanteen/pages/editMenu.dart';
+import 'package:qanteen/pages/editStand.dart';
+import '../model/menu_model.dart';
 
 class Menu extends StatefulWidget {
   final String standId;
@@ -30,10 +33,34 @@ class _Menu extends State<Menu> {
     return listStand;
   }
 
+  String standName = "Please Wait...";
+  Future getStandById(String standId) async {
+    await FirebaseFirestore.instance.collection('Stands').doc(standId).get().then((data) {
+      var stand = data.data();
+      if (stand != null) {
+        setState(() {
+          standName = stand['name'].toString();
+        });
+      }
+    });
+  }
+
+  Future deleteFile(String standId, String menuId) async {
+    final storageRef = FirebaseStorage.instance.ref();
+
+    final imgDelete = storageRef.child("${standId}/${menuId}");
+    await imgDelete.delete().then((msg) {
+      print("Berhasil");
+    }, onError: (e) {
+      print("Error ${e}");
+    });
+  }
+
   Future<String> deleteMenu(String standId, String menuId) async {
     late String message;
     try {
       await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).delete().then((msg) {
+        deleteFile(standId, menuId);
         message = "Menu Berhasil di Hapus";
       }, onError: (e) {
         message = "Terjadi Masalah : ${e}";
@@ -44,25 +71,43 @@ class _Menu extends State<Menu> {
     return message;
   }
 
+  Future<void> addCart(String userUid, String standId, String menuId, int Total) async {
+    // await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get();
+    // await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").set({
+    //   "standId" : standId,
+    //   "menuId" : menuId,
+    //   "total" : 1,
+    // });
+  }
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getStandById(standId);
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Menu"),
+          title: Text("Menu, ${standName}"),
           actions: [
             IconButton(
               onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => AddMenu(
-                              standId: standId,
-                            ))).then((msg) => setState(() {
+                        builder: (context) => EditStand(standId: standId))).then((msg) => setState(() {
+                          getStandById(standId);
                   var snackBar = SnackBar(content: Text(msg));
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 }));
               },
-              icon: const Icon(Icons.restaurant_menu),
-            )
+              icon: const Icon(Icons.edit),
+            ),
+            IconButton(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => Cart())),
+                icon: Icon(Icons.shopping_cart))
           ],
         ),
         body: FutureBuilder(
@@ -89,8 +134,8 @@ class _Menu extends State<Menu> {
                                 height: 80,
                                 child: Center(
                                     child: ListTile(
-                                        leading: Image.network(
-                                            data[index].imgUrl),
+                                        leading: (data[index].imgUrl != "placeholder") ? Image.network(
+                                            data[index].imgUrl) : Icon(Icons.restaurant_menu),
                                         title: Text(
                                             data[index].name.toString()),
                                         subtitle: Text(
@@ -111,6 +156,8 @@ class _Menu extends State<Menu> {
                                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                                   });
                                                 });
+                                              } else if (value == 3) {
+                                                
                                               }
                                             },
                                           itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
@@ -120,6 +167,9 @@ class _Menu extends State<Menu> {
                                             const PopupMenuItem<int>(
                                                 value: 2,
                                                 child: const Text("Delete")),
+                                            const PopupMenuItem<int>(
+                                                value: 3,
+                                                child: const Text("Add To Cart"))
                                           ]),
                                       ),
                                     ))));
@@ -134,6 +184,21 @@ class _Menu extends State<Menu> {
               );
             }
           },
-        ));
+        ),
+        floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddMenu(
+                        standId: standId,
+                      ))).then((msg) => setState(() {
+                var snackBar = SnackBar(content: Text(msg));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              }));
+            },
+            child: Icon(Icons.restaurant_menu),
+        ),
+    );
   }
 }

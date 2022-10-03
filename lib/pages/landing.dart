@@ -1,7 +1,8 @@
-import 'dart:ffi';
 import 'package:flutter/material.dart';
-import 'package:qanteen/index.dart';
-import 'package:qanteen/slider.dart';
+import 'package:qanteen/pages/index.dart';
+import 'package:qanteen/pages/login.dart';
+import 'package:qanteen/pages/signup.dart';
+import 'package:qanteen/pages/slider.dart';
 
 class Landing extends StatefulWidget {
   @override
@@ -14,19 +15,19 @@ class _LandingState extends State<Landing> {
 
   List<Widget> _pages = [
     SliderPage(
-        title: "Keep",
+        title: "Cepat",
         description:
-        "Accept cryptocurrencies and digital assets, keep thern here, or send to orthers",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         image: "assets/1.svg"),
     SliderPage(
-        title: "Buy",
+        title: "Mudah",
         description:
-        "Buy Bitcoin and cryptocurrencies with VISA and MasterVard right in the App",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         image: "assets/2.svg"),
     SliderPage(
-        title: "Sell",
+        title: "Praktis",
         description:
-        "Sell your Bitcoin cryptocurrencies or Change with orthres digital assets or flat money",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         image: "assets/3.svg"),
   ];
 
@@ -123,7 +124,7 @@ class _LandingState extends State<Landing> {
 
 class WelcomePage extends StatelessWidget {
   Widget FlutterButton(
-      {required String name, Color? color, Color? textColor, Color? backgroundColor, required BuildContext context}) {
+      {required String name, Color? color, Color? textColor, Color? backgroundColor, required BuildContext context, required Widget page}) {
     final ButtonStyle style = ElevatedButton.styleFrom(
         backgroundColor: Color(0xFFC21010),
         shape: RoundedRectangleBorder(
@@ -144,7 +145,9 @@ class WelcomePage extends StatelessWidget {
             child: ElevatedButton(
               style: style,
               onPressed: () {
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
+                // temporary
+                // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => page));
               },
               child: Text(
                 name,
@@ -196,11 +199,13 @@ class WelcomePage extends StatelessWidget {
                     name: 'Login',
                     textColor: Colors.white,
                     context: context,
+                    page: LoginPage(),
                   ),
                   FlutterButton(
                     name: 'SignUp',
                     textColor: Colors.white,
                     context: context,
+                    page: SignUpPage(),
                   ),
                 ],
               ),
