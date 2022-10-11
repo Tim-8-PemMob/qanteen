@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/pages/index.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditStand extends StatefulWidget {
   final String standId;
@@ -19,6 +22,31 @@ class _EditStand extends State<EditStand> {
   _EditStand({required this.standId});
 
   TextEditingController tName = TextEditingController(text: "");
+  final ImagePicker imagePicker = ImagePicker();
+  File? image;
+  String oldImage = "";
+  String oldImgName = "";
+
+  Future getImagePath() async {
+    final pickedImg = await imagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      image = File(pickedImg!.path);
+      oldImage = "";
+    });
+  }
+
+  Future<String> fileUpload(File imgPath, String standId) async {
+    final storageRef = FirebaseStorage.instance.ref();
+    late String downloadUrl;
+    final imgRef = storageRef.child("${standId}/${standId}");
+    try {
+      await imgRef.putFile(imgPath);
+      downloadUrl = await imgRef.getDownloadURL();
+    } catch (e) {
+      print("error : ${e}");
+    }
+    return downloadUrl;
+  }
 
   Future getStandById(String standId) async {
     await FirebaseFirestore.instance.collection('Stands').doc(standId).get().then((data) {
@@ -26,20 +54,35 @@ class _EditStand extends State<EditStand> {
       if (stand != null) {
         setState(() {
           tName = TextEditingController(text: stand['name'].toString());
+          oldImage = stand['image'];
         });
       }
     });
   }
 
-  Future<String> editStand() async {
+  Future<String> editStand(File? image, String standId, String oldImageUrl) async {
     late String message;
-    await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
-      "name" : tName.text,
-    }).then((res) {
-      message = "Stand Berhasil Di Edit";
-    }, onError: (e) {
-      message = "Terjadi Masalah ${e}";
-    });
+
+    if(oldImage == "") {
+      await fileUpload(image!, standId).then((url) async {
+        await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
+          "name" : tName.text,
+          "image" : url,
+        });
+        message = "Stand Berhasil Di Edit";
+        }, onError: (e) {
+        message = "Terjadi Masalah ${e}";
+      });
+    } else {
+      await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
+        "name" : tName.text,
+        "image" : oldImageUrl,
+      }).then((res) {
+        message = "Stand Berhasil Di Edit";
+      }, onError: (e) {
+        message = "Terjadi Masalah ${e}";
+      });
+    }
     return message;
   }
 
@@ -72,6 +115,7 @@ class _EditStand extends State<EditStand> {
 
   @override
   Widget build(BuildContext context) {
+    var img = image;
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
@@ -97,14 +141,30 @@ class _EditStand extends State<EditStand> {
             Expanded(
                 child: Column(
                   children: [
+                    IconButton(
+                        onPressed: () => getImagePath(),
+                        icon: const Icon(Icons.image)
+                    ),
+                    (oldImage == "" && img != null)?
+                    Image(
+                        height: MediaQuery.of(context).size.height/5 ,
+                        width: MediaQuery.of(context).size.height ,
+                        image: FileImage(img))
+                        : (oldImage == "" && img == null)?
+                    CircularProgressIndicator()
+                        : Image(
+                        height: MediaQuery.of(context).size.height/5 ,
+                        width: MediaQuery.of(context).size.height ,
+                        image: NetworkImage(oldImage)),
                     TextField(
                       controller: tName,
                       decoration: const InputDecoration(
-                          hintText: "Nama Stand"
+                          hintText: "Nama Stand Anda",
+                          labelText: "Nama Baru Stand Anda"
                       ),
                     ),
                     TextButton(
-                        onPressed: () async => editStand().then((msg) {
+                        onPressed: () async => editStand(img, standId, oldImage).then((msg) {
                           var snackBar = SnackBar(content: Text(msg));
                           if (msg == "Stand Berhasil Di Edit") {
                             // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Menu(standId: standId)));

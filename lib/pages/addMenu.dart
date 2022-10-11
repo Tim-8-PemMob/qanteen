@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -21,14 +20,13 @@ class _AddMenu extends State<AddMenu> {
 
   TextEditingController tName = TextEditingController(text: "");
   TextEditingController tPrice = TextEditingController(text: "");
+  TextEditingController tTotal = TextEditingController(text: "");
 
   final ImagePicker imagePicker = ImagePicker();
   File? image;
 
   Future getImagePath() async {
     final pickedImg = await imagePicker.pickImage(source: ImageSource.gallery);
-    print("image name : ${pickedImg!.name}");
-    print("image path : ${pickedImg!.path}");
     setState(() {
       image = File(pickedImg!.path);
     });
@@ -53,6 +51,7 @@ class _AddMenu extends State<AddMenu> {
       "image" : "placeholder",
       "name" : tName.text.toString(),
       "price" : int.parse(tPrice.text),
+      "total" : int.parse(tTotal.text),
     }).then((res) async {
       await fileUpload(imgPath, standId, res.id).then((url) async {
         await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(res.id).update({
@@ -90,19 +89,29 @@ class _AddMenu extends State<AddMenu> {
                     TextField(
                       controller: tName,
                       decoration: const InputDecoration(
-                        hintText: "Nama Menu"
+                        hintText: "Nama Menu Anda",
+                        labelText: "Nama Menu",
                       ),
                     ),
                     TextField(
                       keyboardType: TextInputType.number,
                       controller: tPrice,
                       decoration: const InputDecoration(
-                          hintText: "Harga Menu"
+                        hintText: "Harga Menu Anda",
+                        labelText: "Harga Menu"
+                      ),
+                    ),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      controller: tTotal,
+                      decoration: const InputDecoration(
+                          hintText: "Total Prosi Yang Anda Jual",
+                          labelText: "Total Menu"
                       ),
                     ),
                     TextButton(
                         onPressed: () async {
-                          if (tName.text.isNotEmpty && tPrice.text.isNotEmpty && image != null){
+                          if (tName.text.isNotEmpty && tPrice.text.isNotEmpty && tTotal.text.isNotEmpty && image != null){
                             inputMenu(standId, image!).then((msg) {
                               var snackBar = SnackBar(content: Text(msg));
                               if (msg == "Menu Berhasil di Tambahkan") {

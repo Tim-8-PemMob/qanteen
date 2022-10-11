@@ -22,6 +22,7 @@ class _EditMenu extends State<EditMenu> {
 
   TextEditingController tName = TextEditingController(text: "");
   TextEditingController tPrice = TextEditingController(text: "");
+  TextEditingController tTotal = TextEditingController(text: "");
 
   final ImagePicker imagePicker = ImagePicker();
   File? image;
@@ -30,8 +31,6 @@ class _EditMenu extends State<EditMenu> {
 
   Future getImagePath() async {
     final pickedImg = await imagePicker.pickImage(source: ImageSource.gallery);
-    print("image name : ${pickedImg!.name}");
-    print("image path : ${pickedImg!.path}");
     setState(() {
       image = File(pickedImg!.path);
       oldImage = "";
@@ -72,6 +71,7 @@ class _EditMenu extends State<EditMenu> {
         setState(() {
           tName = TextEditingController(text: menu['name'].toString());
           tPrice = TextEditingController(text: menu['price'].toString());
+          tTotal = TextEditingController(text: menu['total'].toString());
           oldImage = menu['image'];
         });
       }
@@ -89,7 +89,7 @@ class _EditMenu extends State<EditMenu> {
         FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).update({
           "name" : tName.text,
           "price" : int.parse(tPrice.text),
-          // edit supaya jika ganti nama tanpa ganti gambar maka akan mengganti nama gambar juga
+          "total" : int.parse(tTotal.text),
           "image" : url,
         });
         message = "Menu Berhasil di Edit";
@@ -100,7 +100,7 @@ class _EditMenu extends State<EditMenu> {
       await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).update({
         "name" : tName.text,
         "price" : int.parse(tPrice.text),
-        // edit supaya jika ganti nama tanpa ganti gambar maka akan mengganti nama gambar juga
+        "total" : int.parse(tTotal.text),
         "image" : oldImageURL,
       }).then((msg) {
         message = "Menu Berhasil di Edit";
@@ -150,14 +150,24 @@ class _EditMenu extends State<EditMenu> {
                     TextField(
                       controller: tName,
                       decoration: const InputDecoration(
-                          hintText: "Nama Menu"
+                          hintText: "Nama Baru Menu",
+                          labelText: "Nama Menu"
                       ),
                     ),
                     TextField(
                       keyboardType: TextInputType.number,
                       controller: tPrice,
                       decoration: const InputDecoration(
-                          hintText: "Harga Menu"
+                          hintText: "Harga Baru Menu",
+                          labelText: "Harga Menu"
+                      ),
+                    ),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      controller: tTotal,
+                      decoration: const InputDecoration(
+                          hintText: "Total Prosi Menu",
+                          labelText: "Total Menu"
                       ),
                     ),
                     TextButton(

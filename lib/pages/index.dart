@@ -8,7 +8,7 @@ Future<List<StandModel>> getStandFireStore() async {
   var listStand = List<StandModel>.empty(growable: true);
   await FirebaseFirestore.instance.collection("Stands").get().then((data) {
     for (var doc in data.docs) {
-      StandModel standModel = StandModel(id: doc.id.toString(), name: doc.data()["name"]);
+      StandModel standModel = StandModel(id: doc.id.toString(), name: doc.data()["name"], image: doc.data()['image']);
       listStand.add(standModel);
     }
   });
@@ -35,7 +35,7 @@ class _Index extends State<Index> {
           var data = snapshot.data;
           if (snapshot.hasError) {
             return Text(snapshot.error.toString());
-          } else if (data != null) {
+          } else if (data != null && data.isNotEmpty) {
             // reference();
             // addMenu();
             return ListView.builder(
@@ -58,7 +58,7 @@ class _Index extends State<Index> {
                               child: Center (
                                   child : ListTile(
                                     leading: const Icon(Icons.food_bank),
-                                    title: Text("Stand : ${data[index].name.toString()}"),
+                                    title: Text("${data[index].name.toString()}"),
                                   )
                               )
                           )
@@ -66,9 +66,13 @@ class _Index extends State<Index> {
                   );
             }
             );
-          } else {
+          } else if (snapshot.connectionState == ConnectionState.waiting){
             return const Center(
                 child: CircularProgressIndicator()
+            );
+          } else {
+            return const Center(
+                child: Text("Stands Makanan Kosong")
             );
           }
         },

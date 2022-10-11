@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:qanteen/pages/addMenu.dart';
 import 'package:qanteen/pages/cart.dart';
 import 'package:qanteen/pages/editMenu.dart';
 import 'package:qanteen/pages/editStand.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../model/menu_model.dart';
 
 class Menu extends StatefulWidget {
@@ -26,7 +29,7 @@ class _Menu extends State<Menu> {
       for (var doc in data.docs) {
         print("name : ${doc.data()['name']}");
         print("price : ${doc.data()['price']}");
-        MenuModel menuModel = MenuModel(id: doc.id.toString(), name: doc.data()["name"], price: doc.data()['price'], imgUrl: doc.data()['image']);
+        MenuModel menuModel = MenuModel(id: doc.id.toString(), name: doc.data()["name"], price: doc.data()['price'], total: doc.data()['total'], imgUrl: doc.data()['image']);
         listStand.add(menuModel);
       }
     });
@@ -71,13 +74,44 @@ class _Menu extends State<Menu> {
     return message;
   }
 
-  Future<void> addCart(String userUid, String standId, String menuId, int Total) async {
+  Future<void> reducePortion(String standId, String menuId ,int totalBuy) async {
+    await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).update({
+      "total" : FieldValue.increment(totalBuy * -1),
+    });
+  }
+
+  Future<String> addCart(String standId, String menuId, int total) async {
     // await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get();
-    // await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").set({
-    //   "standId" : standId,
-    //   "menuId" : menuId,
-    //   "total" : 1,
-    // });
+    final dbInstance = FirebaseFirestore.instance;
+    final prefs = await SharedPreferences.getInstance();
+    final String? userUid = prefs.getString("userUid");
+    late String message;
+    await dbInstance.collection("Users").doc(userUid).collection("Cart").where("menuId", isEqualTo: menuId).get().then((data) async {
+      if (data.docs.isEmpty) {
+        await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").add({
+          "standId" :standId,
+          "menuId" : menuId,
+          "total" : total,
+        }).then((msg) async {
+          await reducePortion(standId, menuId, total);
+          message = "Menu Di Tambahkan Ke Cart";
+        }, onError: (e) {
+          message = "Terjadi Masalah ${e}";
+        });
+      } else {
+        for(var doc in data.docs) {
+          await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").doc(doc.id).update({
+            "total" : FieldValue.increment(total),
+          }).then((msg) async {
+            await reducePortion(standId, menuId, total);
+            message = "Menu Di Tambahkan Ke Cart";
+          }, onError: (e) {
+            message = "Terjadi Masalah ${e}";
+          });
+        }
+      }
+    });
+    return message;
   }
   
   @override
@@ -138,10 +172,16 @@ class _Menu extends State<Menu> {
                                             data[index].imgUrl) : Icon(Icons.restaurant_menu),
                                         title: Text(
                                             data[index].name.toString()),
-                                        subtitle: Text(
-                                            "Rp. ${data[index].price.toString()}"),
+                                        subtitle: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text("Rp. ${data[index].price.toString()}"),
+                                            Text("Porsi : ${data[index].total.toString()}"),
+                                          ],
+                                        ),
                                         trailing: PopupMenuButton<int>(
-                                            onSelected: (value) {
+                                            onSelected: (value) async {
                                               if (value == 1) {
                                                 Navigator.push(context, MaterialPageRoute(builder: (builder) => EditMenu(standId: standId, menuId: data[index].id))).then(
                                                         (msg) => setState(() {
@@ -157,7 +197,13 @@ class _Menu extends State<Menu> {
                                                   });
                                                 });
                                               } else if (value == 3) {
-                                                
+                                                // ubah total
+                                                addCart(standId, data[index].id, 1).then((msg) {
+                                                  setState(() {
+                                                    var snackBar = SnackBar(content: Text(msg));
+                                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                  });
+                                                });
                                               }
                                             },
                                           itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[

@@ -1,7 +1,7 @@
 import 'dart:convert';
-
+import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qanteen/pages/addStand.dart';
@@ -10,13 +10,13 @@ import 'package:qanteen/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 Future<dynamic> signIn(String email, String password) async {
+  final prefs = await SharedPreferences.getInstance();
   try {
     UserCredential user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
     final userData = await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).get();
     var data = jsonDecode(jsonEncode(userData.data()));
-    print("user data : ${data.runtimeType}");
-    print(data["name"]);
-    print("user : ${user.user}");
+    var logedUser = user.user;
+    if (logedUser != null) await prefs.setString("userUid", logedUser.uid);
     return data;
   } catch (e) {
     print(e);
