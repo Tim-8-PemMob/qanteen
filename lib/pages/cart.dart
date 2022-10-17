@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qanteen/pages/userOrder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/cart_model.dart';
@@ -11,6 +12,17 @@ class Cart extends StatefulWidget {
 }
 
 class _Cart extends State<Cart> {
+
+  late TextEditingController _controller;
+  late String userUid;
+
+  Future<void> getUserUid() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userUid = prefs.getString("userUid")!;
+    setState(() {
+      _controller = new TextEditingController(text: userUid);
+    });
+  }
 
   Future<List<CartModel>> getCartById() async {
     final prefs = await SharedPreferences.getInstance();
@@ -84,9 +96,6 @@ class _Cart extends State<Cart> {
   }
 
   Future<String> reduceTotal(String standId, String menuId, String cartDocId, int totalReduce) async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? userUid = prefs.getString("userUid");
-
     late String message;
     await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").doc(cartDocId).get().then((data) async {
       if(data['total'] > 1) {
@@ -106,10 +115,72 @@ class _Cart extends State<Cart> {
     return message;
   }
 
+  Future<void> PlaceOrder() async {
+    Timestamp orderTime = Timestamp.fromDate(DateTime.now());
+    final prefs = await SharedPreferences.getInstance();
+    final String? userUid = prefs.getString("userUid");
+
+    late String userName, menuName;
+    late int menuPrice;
+    await FirebaseFirestore.instance.collection("Users").doc(userUid).get().then((data) {
+      var user = data.data();
+      if (user != null) {
+        userName = user['name'];
+      }
+    });
+
+    await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").get().then((res) async {
+      for (var doc in res.docs) {
+
+        await FirebaseFirestore.instance.collection("Stands").doc(doc.data()['standId']).collection("Menus").doc(doc.data()['menuId']).get().then((data) {
+          var menu = data.data();
+          if (menu != null) {
+            menuName = menu['name'];
+            menuPrice = menu['price'];
+          }
+        });
+        // masukkan data ke order collections
+        // hapus semua data di cart collections
+        await FirebaseFirestore.instance.collection("Stands").doc(doc.data()['standId']).collection("Orders").add({
+          "userUid" : userUid,
+          "menuId" : doc.data()['menuId'],
+          "userName" : userName,
+          "menuName" : menuName, // harga per menu atau total harga pesanan
+          "menuPrice" : menuPrice,
+          "total" : doc.data()['total'],
+          "status" : "Pending",
+        }).then((res) async {
+          await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").add({
+            "refOrder" : res,
+            "timeOrder" : orderTime,
+          });
+          await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").doc(doc.id).delete();
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    userUid = "";
+    getUserUid();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Cart"),),
+      appBar: AppBar(
+        title: Text("Cart"),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => UserOrder(userUid: userUid)));
+              },
+              icon: Icon(Icons.query_builder))
+        ],
+      ),
       body: FutureBuilder(
         future: getCartById(),
         builder: (context, snapshot) {
@@ -188,9 +259,14 @@ class _Cart extends State<Cart> {
             return const Center(
                 child: Text("Anda Belum Menambahkan Data ke Cart")
             );
-
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await PlaceOrder();
+        },
+        child: Icon(Icons.monetization_on),
       ),
     );
   }

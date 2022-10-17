@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:qanteen/home/home.dart';
 import 'package:qanteen/pages/menu.dart';
 import 'package:qanteen/model/stand_model.dart';
 import 'addStand.dart';
@@ -28,6 +29,11 @@ class _Index extends State<Index> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Stand Makanan"),
+        actions: [
+          IconButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => home())),
+              icon: Icon(Icons.home))
+        ],
       ),
       body: FutureBuilder(
         future: getStandFireStore(),

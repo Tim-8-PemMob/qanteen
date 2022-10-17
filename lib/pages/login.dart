@@ -9,6 +9,8 @@ import 'package:qanteen/pages/index.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../home/home.dart';
+
 Future<dynamic> signIn(String email, String password) async {
   final prefs = await SharedPreferences.getInstance();
   try {
@@ -110,7 +112,7 @@ class _LoginPage extends State<LoginPage> {
                           if (res != null) {
                             if (res['role'] == "user") {
                               // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => Index()));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => home()));
                             } else if (res['role'] == 'seller') {
                               Navigator.push(context, MaterialPageRoute(builder: (context) => AddStand()));
                             }

@@ -9,6 +9,7 @@ import 'package:qanteen/pages/editMenu.dart';
 import 'package:qanteen/pages/editStand.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/menu_model.dart';
+import 'standOrder.dart';
 
 class Menu extends StatefulWidget {
   final String standId;
@@ -141,7 +142,10 @@ class _Menu extends State<Menu> {
             ),
             IconButton(
                 onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => Cart())),
-                icon: Icon(Icons.shopping_cart))
+                icon: Icon(Icons.shopping_cart)),
+            IconButton(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => StandOrder(standId: standId))),
+                icon: Icon(Icons.production_quantity_limits)),
           ],
         ),
         body: FutureBuilder(
