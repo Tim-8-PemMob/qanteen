@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/pages/menu.dart';
 
@@ -17,93 +18,84 @@ class StandContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 270,
-      width: 200,
-      margin: EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.redAccent[400],
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromARGB(104, 82, 82, 82),
-            offset: const Offset(
-              5.0,
-              5.0,
+        height: 270,
+        width: 200,
+        margin: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromARGB(104, 82, 82, 82),
+              offset: const Offset(
+                5.0,
+                5.0,
+              ),
+              blurRadius: 10.0,
+              spreadRadius: 3.0,
+            ), //BoxShadow
+            BoxShadow(
+              color: Colors.white,
+              offset: const Offset(0.0, 0.0),
+              blurRadius: 0.0,
+              spreadRadius: 0.0,
             ),
-            blurRadius: 10.0,
-            spreadRadius: 3.0,
-          ), //BoxShadow
-          BoxShadow(
-            color: Colors.white,
-            offset: const Offset(0.0, 0.0),
-            blurRadius: 0.0,
-            spreadRadius: 0.0,
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Menu(standId : standId)));
-        },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              child: CircleAvatar(
-                // default : 60
-                radius: 10,
-                backgroundImage: NetworkImage(image),
-                backgroundColor: Color.fromARGB(139, 255, 255, 255),
-              ),
-            ),
-            ListTile(
-              leading: Text(
-                nmrStand,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
-              ),
-              trailing: Text(
-                namaStand,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.star,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  Icon(
-                    Icons.star,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  Icon(
-                    Icons.star,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  Icon(
-                    Icons.star,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ],
-              ),
-            )
           ],
         ),
-      )
-    );
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Menu(standId: standId)));
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+                child: Image.network(
+                  image,
+                  height: 150,
+                  width: double.infinity,
+                  fit: BoxFit.fill,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  children: [
+                    Text(
+                      namaStand,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 8.0,
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(CupertinoIcons.heart),
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(CupertinoIcons.cart),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ));
   }
 }

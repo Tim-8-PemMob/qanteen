@@ -5,17 +5,22 @@ import 'package:flutter/services.dart';
 import 'package:qanteen/pages/addStand.dart';
 import 'package:qanteen/pages/login.dart';
 
-Future<void> signUp(String name, String email, String password, String confirmPassword) async {
+Future<void> signUp(
+    String name, String email, String password, String confirmPassword) async {
   try {
     if (password == confirmPassword) {
-      UserCredential user = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential user = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       print("data user : ${user}");
       print("data user.user ${user.user}");
-      await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).set({
-        "name" : name,
+      await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(user.user!.uid)
+          .set({
+        "name": name,
       });
     }
-  } catch(e) {
+  } catch (e) {
     print(e);
   }
 }
@@ -26,7 +31,6 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPage extends State<SignUpPage> {
-
   TextEditingController tName = TextEditingController(text: "");
   TextEditingController tEmail = TextEditingController(text: "");
   TextEditingController tPassword = TextEditingController(text: "");
@@ -81,10 +85,17 @@ class _SignUpPage extends State<SignUpPage> {
               ),
               Column(
                 children: <Widget>[
-                  inputFile(label: "Nama Lengkap", textEditingController:  tName),
+                  inputFile(
+                      label: "Nama Lengkap", textEditingController: tName),
                   inputFile(label: "Email", textEditingController: tEmail),
-                  inputFile(label: "Password", textEditingController: tPassword,obscureText: true),
-                  inputFile(label: "Konfirmasi Password", textEditingController: tConfirm ,obscureText: true),
+                  inputFile(
+                      label: "Password",
+                      textEditingController: tPassword,
+                      obscureText: true),
+                  inputFile(
+                      label: "Konfirmasi Password",
+                      textEditingController: tConfirm,
+                      obscureText: true),
                 ],
               ),
               Container(
@@ -102,9 +113,10 @@ class _SignUpPage extends State<SignUpPage> {
                   minWidth: double.infinity,
                   height: 60,
                   onPressed: () {
-                    signUp(tName.text ,tEmail.text, tPassword.text, tConfirm.text);
+                    signUp(
+                        tName.text, tEmail.text, tPassword.text, tConfirm.text);
                   },
-                  color: Color(0xff0095FF),
+                  color: Colors.red[700],
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50),
@@ -143,7 +155,10 @@ class _SignUpPage extends State<SignUpPage> {
   }
 }
 
-Widget inputFile({label, obscureText = false, required TextEditingController textEditingController}) {
+Widget inputFile(
+    {label,
+    obscureText = false,
+    required TextEditingController textEditingController}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
