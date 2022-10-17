@@ -15,20 +15,17 @@ class _LandingState extends State<Landing> {
 
   List<Widget> _pages = [
     SliderPage(
-        title: "Cepat",
-        description:
-        "Aplikasi Ini ....",
-        image: "assets/open.png"),
-    SliderPage(
         title: "Mudah",
-        description:
-        "Aplikasi Ini ....",
-        image: "assets/open.png"),
+        description: "Pesan makanan dengan menggunakan layanan otomatis",
+        image: "assets/easy.png"),
     SliderPage(
-        title: "Praktis",
-        description:
-        "Aplikasi Ini ....",
-        image: "assets/open.png"),
+        title: "Cepat",
+        description: "Pesan makanan Anda tanpa perlu mengantri lama",
+        image: "assets/fast.png"),
+    SliderPage(
+        title: "Hemat",
+        description: "Dapatkan berbagai diskon untuk penggguna pertama",
+        image: "assets/discount.jpg"),
   ];
 
   _onchanged(int index) {
@@ -62,7 +59,7 @@ class _LandingState extends State<Landing> {
                         height: 10,
                         width: (index == _currentPage) ? 30 : 10,
                         margin:
-                        EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                            EdgeInsets.symmetric(horizontal: 5, vertical: 30),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
                             color: (index == _currentPage)
@@ -85,30 +82,30 @@ class _LandingState extends State<Landing> {
                       borderRadius: BorderRadius.circular(35)),
                   child: (_currentPage == (_pages.length - 1))
                       ? SizedBox(
-                    height: double.infinity,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => WelcomePage()),
-                        );
-                      },
-                      child: const Text('Start!'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFC21010),
-                        shape: RoundedRectangleBorder(
-                          //to set border radius to button
-                            borderRadius: BorderRadius.circular(50)),
-                      ),
-                    ),
-                  )
+                          height: double.infinity,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => WelcomePage()),
+                              );
+                            },
+                            child: const Text('Start!'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFFC21010),
+                              shape: RoundedRectangleBorder(
+                                  //to set border radius to button
+                                  borderRadius: BorderRadius.circular(50)),
+                            ),
+                          ),
+                        )
                       : Icon(
-                    Icons.navigate_next,
-                    size: 50,
-                    color: Colors.white,
-                  ),
+                          Icons.navigate_next,
+                          size: 50,
+                          color: Colors.white,
+                        ),
                 ),
               ),
               SizedBox(
@@ -124,11 +121,16 @@ class _LandingState extends State<Landing> {
 
 class WelcomePage extends StatelessWidget {
   Widget FlutterButton(
-      {required String name, Color? color, Color? textColor, Color? backgroundColor, required BuildContext context, required Widget page}) {
+      {required String name,
+      Color? color,
+      Color? textColor,
+      Color? backgroundColor,
+      required BuildContext context,
+      required Widget page}) {
     final ButtonStyle style = ElevatedButton.styleFrom(
         backgroundColor: Color(0xFFC21010),
         shape: RoundedRectangleBorder(
-          //to set border radius to button
+            //to set border radius to button
             borderRadius: BorderRadius.circular(80)),
         textStyle: TextStyle(fontSize: 20, color: color));
 
@@ -147,7 +149,8 @@ class WelcomePage extends StatelessWidget {
               onPressed: () {
                 // temporary
                 // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => page));
               },
               child: Text(
                 name,
@@ -168,8 +171,14 @@ class WelcomePage extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
+              margin:
+                  EdgeInsets.only(top: MediaQuery.of(context).size.width * 0.4),
               child: Center(
-                child: Image.asset('assets/logo.png'),
+                child: Image.asset(
+                  'assets/food-stall.png',
+                  height: 200,
+                  width: 200,
+                ),
               ),
             ),
           ),

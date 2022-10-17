@@ -6,7 +6,8 @@ class SliderPage extends StatelessWidget {
   final String description;
   final String image;
 
-  SliderPage({required this.title, required this.description, required this.image});
+  SliderPage(
+      {required this.title, required this.description, required this.image});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class SliderPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          SvgPicture.asset(
+          Image.asset(
             image,
             width: width * 0.6,
           ),

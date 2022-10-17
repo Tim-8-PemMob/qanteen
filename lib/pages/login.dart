@@ -14,8 +14,12 @@ import '../home/home.dart';
 Future<dynamic> signIn(String email, String password) async {
   final prefs = await SharedPreferences.getInstance();
   try {
-    UserCredential user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-    final userData = await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).get();
+    UserCredential user = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
+    final userData = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(user.user!.uid)
+        .get();
     var data = jsonDecode(jsonEncode(userData.data()));
     var logedUser = user.user;
     if (logedUser != null) await prefs.setString("userUid", logedUser.uid);
@@ -31,7 +35,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPage extends State<LoginPage> {
-
   TextEditingController tEmail = TextEditingController(text: "");
   TextEditingController tPassword = TextEditingController(text: "");
 
@@ -87,7 +90,10 @@ class _LoginPage extends State<LoginPage> {
                   child: Column(
                     children: [
                       inputFile(label: "Email", textEditingController: tEmail),
-                      inputFile(label: "Password", textEditingController: tPassword ,obscureText: true)
+                      inputFile(
+                          label: "Password",
+                          textEditingController: tPassword,
+                          obscureText: true)
                     ],
                   ),
                 ),
@@ -112,17 +118,26 @@ class _LoginPage extends State<LoginPage> {
                           if (res != null) {
                             if (res['role'] == "user") {
                               // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => home()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => home()));
                             } else if (res['role'] == 'seller') {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => AddStand()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AddStand()));
                             }
                           } else {
-                            var snackBar = SnackBar(content: Text("Mohon Periksa Lagi User dan Email Anda"));
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                            var snackBar = SnackBar(
+                                content: Text(
+                                    "Mohon Periksa Lagi User dan Email Anda"));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
                           }
                         });
                       },
-                      color: Color(0xff0095FF),
+                      color: Colors.red[700],
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
@@ -175,7 +190,10 @@ class _LoginPage extends State<LoginPage> {
   }
 }
 
-Widget inputFile({label, obscureText = false, required TextEditingController textEditingController}) {
+Widget inputFile(
+    {label,
+    obscureText = false,
+    required TextEditingController textEditingController}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[

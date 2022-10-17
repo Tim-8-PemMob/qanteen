@@ -14,9 +14,7 @@ class HomeBanner extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         image: DecorationImage(
-            image: NetworkImage(
-                'https://img.freepik.com/free-photo/traditional-nasi-lemak-meal-composition_23-2149056831.jpg?w=740&t=st=1665115789~exp=1665116389~hmac=5f93b4ef7a6b26c999ca6a6106109ef58d7e843cb97a447d2dae6fc637e9a6e6'),
-            fit: BoxFit.cover),
+            image: AssetImage('assets/banner.jpg'), fit: BoxFit.cover),
         color: Colors.redAccent,
         borderRadius: BorderRadius.circular(10),
       ),

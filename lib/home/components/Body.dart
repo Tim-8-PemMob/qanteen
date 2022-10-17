@@ -13,7 +13,10 @@ Future<List<StandModel>> getStandFireStore() async {
   var listStand = List<StandModel>.empty(growable: true);
   await FirebaseFirestore.instance.collection("Stands").get().then((data) {
     for (var doc in data.docs) {
-      StandModel standModel = StandModel(id: doc.id.toString(), name: doc.data()["name"], image: doc.data()['image']);
+      StandModel standModel = StandModel(
+          id: doc.id.toString(),
+          name: doc.data()["name"],
+          image: doc.data()['image']);
       listStand.add(standModel);
     }
   });
@@ -66,46 +69,44 @@ class _Body extends State<Body> {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * (10 / 375)),
-              // height: 500,
-              child: FutureBuilder(
-                future: getStandFireStore(),
-                builder: (context, snapshot) {
-                  var data = snapshot.data;
-                  if (snapshot.hasError) {
-                    return Text(snapshot.error.toString());
-                  } else if (data != null && data.isNotEmpty) {
-                    // reference();
-                    // addMenu();
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      primary: false,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                      ),
-                      itemCount: data.length,
-                      itemBuilder: (context, index) {
-                        return StandContainer(
-                          image: data[index].image,
-                          namaStand: data[index].name,
-                          nmrStand: "${index}",
-                          standId: data[index].id,
-                        );
-                      },
-                    );
-                  } else if (snapshot.connectionState == ConnectionState.waiting){
-                    return const Center(
-                        child: CircularProgressIndicator()
-                    );
-                  } else {
-                    return const Center(
-                        child: Text("Stands Makanan Kosong")
-                    );
-                  }
-                },
-              )
-            )
+                padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * (10 / 375)),
+                // height: 500,
+                child: FutureBuilder(
+                  future: getStandFireStore(),
+                  builder: (context, snapshot) {
+                    var data = snapshot.data;
+                    if (snapshot.hasError) {
+                      return Text(snapshot.error.toString());
+                    } else if (data != null && data.isNotEmpty) {
+                      // reference();
+                      // addMenu();
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        primary: false,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisExtent: 280,
+                        ),
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          return StandContainer(
+                            image: data[index].image,
+                            namaStand: data[index].name,
+                            nmrStand: "${index}",
+                            standId: data[index].id,
+                          );
+                        },
+                      );
+                    } else if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else {
+                      return const Center(child: Text("Stands Makanan Kosong"));
+                    }
+                  },
+                ))
           ],
         ),
       ),
