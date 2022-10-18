@@ -114,6 +114,7 @@ class _LoginPage extends State<LoginPage> {
                       minWidth: double.infinity,
                       height: 60,
                       onPressed: () {
+                        FocusManager.instance.primaryFocus?.unfocus();
                         signIn(tEmail.text, tPassword.text).then((res) {
                           if (res != null) {
                             if (res['role'] == "user") {
