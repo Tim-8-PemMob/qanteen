@@ -1,6 +1,7 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:qanteen/pages/User/profile.dart';
 import 'components/Body.dart';
 
 class home extends StatefulWidget {
@@ -23,11 +24,7 @@ class _homeState extends State<home> {
         "Tampilan Riwayat Pesanan",
       ),
     ),
-    Center(
-      child: Text(
-        "Tampilan Profile",
-      ),
-    ),
+    myProfile()
   ];
 
   @override
