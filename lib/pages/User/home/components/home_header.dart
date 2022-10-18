@@ -1,14 +1,37 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/pages/User/cart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Body.dart';
 import 'icon_btn_with_counter.dart';
 import 'search_field.dart';
 
-class HomeHeader extends StatelessWidget {
-  const HomeHeader({
-    Key? key,
-  }) : super(key: key);
+class HomeHeader extends StatefulWidget {
+  @override
+  _HomeHeader createState() => _HomeHeader();
+}
+
+class _HomeHeader extends State<HomeHeader> {
+
+  int totalCart = 0;
+  Future<void> countCart() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? userUid = prefs.getString("userUid");
+
+    QuerySnapshot docSnap = await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").get();
+    List<DocumentSnapshot> cartSnapshot = docSnap.docs;
+    setState(() {
+      totalCart = cartSnapshot.length;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    countCart();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +51,7 @@ class HomeHeader extends StatelessWidget {
               // TODO: delete this
               Navigator.push(context, MaterialPageRoute(builder: (builder) => Cart()));
             },
-            numOfItems: 7,
+            numOfItems: totalCart,
           )
         ],
       ),

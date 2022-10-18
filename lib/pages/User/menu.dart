@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +19,6 @@ class _Menu extends State<Menu> {
   final String standId;
   _Menu({required this.standId});
 
-  // TextEditingController tTotal = TextEditingController(text: '1');
-  Map<String, String> inputs = {};
-
   String capitalizeAllWord(String value) {
     var result = value[0].toUpperCase();
     for (int i = 1; i < value.length; i++) {
@@ -32,8 +31,13 @@ class _Menu extends State<Menu> {
     return result;
   }
 
+  Map<String,TextEditingController> textEditingControllers = {};
+  var textFields = <TextField>[];
+
   Future<List<MenuModel>> getMenuFireStore(String standId) async {
+
     var listStand = List<MenuModel>.empty(growable: true);
+
     await FirebaseFirestore.instance
         .collection("Stands")
         .doc(standId)
@@ -51,6 +55,15 @@ class _Menu extends State<Menu> {
             imgUrl: doc.data()['image']);
         listStand.add(menuModel);
       }
+    });
+
+    listStand.forEach((str) {
+      var textEditingController = new TextEditingController(text: "1");
+      textEditingControllers.putIfAbsent(str.id, ()=>textEditingController);
+      return textFields.add( TextField(
+        controller: textEditingController,
+        textAlign: TextAlign.center,
+      ));
     });
     return listStand;
   }
@@ -212,40 +225,48 @@ class _Menu extends State<Menu> {
                                           "Rp. ${data[index].price.toString()}"),
                                     ],
                                   ),
-                                    trailing: Row(
+                                    trailing: (data[index].total >= 1) ? Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         SizedBox(
-                                          width: 60,
-                                          child: TextFormField(
-                                            onChanged: (value) {
-                                              inputs['${data[index].id}'] = value;
-                                            },
-                                            textAlign: TextAlign.center,
-                                            keyboardType: TextInputType.number,
-                                            decoration: const InputDecoration(
-                                              hintText: "Total",
-                                            )
-                                          ),
+                                            width: 60,
+                                            child: textFields[index]
                                         ),
                                         IconButton(
                                           onPressed: () {
-                                            if (inputs['${data[index].id}'] != null) {
-                                              addCart(standId, data[index].id, int.parse(inputs['${data[index].id}']!), standName).then((msg) {
-                                                if(msg == "Menu Di Tambahkan Ke Cart") {
-                                                  setState(() {
-                                                    inputs.clear();
+                                            FocusManager.instance.primaryFocus?.unfocus();
+                                            if (textEditingControllers[data[index].id] != null) {
+                                              if (int.parse(textEditingControllers[data[index].id]!.text) >= 1) {
+                                                if (int.parse(textEditingControllers[data[index].id]!.text) <= data[index].total) {
+                                                  addCart(standId, data[index].id, int.parse(textEditingControllers[data[index].id]!.text), standName).then((msg) {
+                                                    setState(() {
+                                                      textEditingControllers[data[index].id]!.text = "1";
+                                                      var snackBar =
+                                                      SnackBar(content: Text(msg));
+                                                      ScaffoldMessenger.of(context)
+                                                          .showSnackBar(snackBar);
+                                                    });
                                                   });
                                                 } else {
-
+                                                  var snackBar = SnackBar(content: Text("Total Melebihi Total Menu"));
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(snackBar);
                                                 }
-                                              });
+                                              } else{
+                                                var snackBar = SnackBar(content: Text("Total Tidak Boleh Dibawah 1"));
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(snackBar);
+                                              }
+                                            } else {
+                                              var snackBar = SnackBar(content: Text("Total Tidak Boleh Kosong"));
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(snackBar);
                                             }
                                           },
                                           icon: Icon(Icons.add_shopping_cart),
                                         ),
                                       ],
-                                    )
+                                    ) : const Text("Menu Habis"),
                                 ),
                               ))));
                 });
