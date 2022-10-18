@@ -81,7 +81,7 @@ class _Menu extends State<Menu> {
     });
   }
 
-  Future<String> addCart(String standId, String menuId, int total) async {
+  Future<String> addCart(String standId, String menuId, int total, String standName) async {
     // await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get();
     final dbInstance = FirebaseFirestore.instance;
     final prefs = await SharedPreferences.getInstance();
@@ -91,6 +91,7 @@ class _Menu extends State<Menu> {
       if (data.docs.isEmpty) {
         await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").add({
           "standId" :standId,
+          "standName" : standName,
           "menuId" : menuId,
           "total" : total,
         }).then((msg) async {
@@ -202,7 +203,7 @@ class _Menu extends State<Menu> {
                                                 });
                                               } else if (value == 3) {
                                                 // ubah total
-                                                addCart(standId, data[index].id, 1).then((msg) {
+                                                addCart(standId, data[index].id, 1, standName).then((msg) {
                                                   setState(() {
                                                     var snackBar = SnackBar(content: Text(msg));
                                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);

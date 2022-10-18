@@ -144,6 +144,8 @@ class _Cart extends State<Cart> {
         await FirebaseFirestore.instance.collection("Stands").doc(doc.data()['standId']).collection("Orders").add({
           "userUid" : userUid,
           "menuId" : doc.data()['menuId'],
+          "standId" : doc.data()['standId'],
+          "standName" : doc.data()['standName'],
           "userName" : userName,
           "menuName" : menuName, // harga per menu atau total harga pesanan
           "menuPrice" : menuPrice,

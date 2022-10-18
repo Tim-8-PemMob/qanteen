@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/model/order_model.dart';
+import 'package:qanteen/pages/detailOrder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/cart_model.dart';
@@ -22,13 +23,13 @@ class _UserOrder extends State<UserOrder> {
     var map = Map();
     List uniqueTime = [];
     await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").get().then((data) {
-      data.docs.map((e) {
-        if(!map.containsKey(e.data()['timeOrder'])) {
-          map[e.data()['timeOrder']] = 1;
-        } else {
-          map[e.data()['timeOrder']] += 1;
-        }
-      }).toList();
+      // data.docs.map((e) {
+      //   if(!map.containsKey(e.data()['timeOrder'])) {
+      //     map[e.data()['timeOrder']] = 1;
+      //   } else {
+      //     map[e.data()['timeOrder']] += 1;
+      //   }
+      // }).toList();
       for(var doc in data.docs) {
         if(!uniqueTime.contains(doc.data()['timeOrder'])) {
           uniqueTime.add(doc.data()['timeOrder']);
@@ -38,17 +39,9 @@ class _UserOrder extends State<UserOrder> {
       }
       print(uniqueTime);
     });
-    print(map);
+    // print(map);
     return uniqueTime;
     // return map;
-  }
-
-  Future<void> getDetailOrder(Timestamp timeOrder) async {
-    await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").where('timeOrder', isEqualTo: timeOrder).get().then((data) {
-      for(var doc in data.docs) {
-        print(doc.data());
-      }
-    });
   }
 
   Future<int> countOrder(Timestamp timeOrder) async {
@@ -94,7 +87,7 @@ class _UserOrder extends State<UserOrder> {
                     ),
                     child: InkWell(
                         onTap: () {
-                            getDetailOrder(snapshot.data![index]);
+                          Navigator.push(context, MaterialPageRoute(builder: (builder) => DetailOrder(timeOrder: snapshot.data![index])));
                         },
                         child: SizedBox (
                             height: 80,
