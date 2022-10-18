@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qanteen/model/order_model.dart';
-import 'package:qanteen/pages/detailOrder.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:qanteen/pages/User/detailOrder.dart';
 
-import '../model/cart_model.dart';
+import '../../model/cart_model.dart';
 
 class UserOrder extends StatefulWidget {
   final String userUid;
@@ -22,7 +20,7 @@ class _UserOrder extends State<UserOrder> {
   Future<List> getUserOrder() async {
     var map = Map();
     List uniqueTime = [];
-    await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").get().then((data) {
+    await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").orderBy('timeOrder', descending: false).get().then((data) {
       // data.docs.map((e) {
       //   if(!map.containsKey(e.data()['timeOrder'])) {
       //     map[e.data()['timeOrder']] = 1;
@@ -50,9 +48,6 @@ class _UserOrder extends State<UserOrder> {
     print(orderSnapshot.length);
     return orderSnapshot.length;
   }
-
-  //TODO: note: untuk ambil oders (semua order milik user) gunakan future karena tidak perlu realtime, tetapi untuk ambil referensinya gunakan stream (untuk memantau status order)
-  //TODO: alternatif: tambahkan timestamp di user order dan kelompokkan berdasarkan time stamp dan gunakan query where ketika di klik detail
 
   @override
   Widget build(BuildContext context) {

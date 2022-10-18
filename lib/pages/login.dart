@@ -1,33 +1,16 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:qanteen/pages/Seller/sellerMenu.dart';
+import 'package:qanteen/pages/Seller/addMenu.dart';
+import 'package:qanteen/pages/User/home/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qanteen/pages/addStand.dart';
+import 'package:qanteen/pages/Admin/addStand.dart';
 import 'package:qanteen/pages/index.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-import '../home/home.dart';
-
-Future<dynamic> signIn(String email, String password) async {
-  final prefs = await SharedPreferences.getInstance();
-  try {
-    UserCredential user = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
-    final userData = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(user.user!.uid)
-        .get();
-    var data = jsonDecode(jsonEncode(userData.data()));
-    var logedUser = user.user;
-    if (logedUser != null) await prefs.setString("userUid", logedUser.uid);
-    return data;
-  } catch (e) {
-    print(e);
-  }
-}
 
 class LoginPage extends StatefulWidget {
   @override
@@ -37,6 +20,26 @@ class LoginPage extends StatefulWidget {
 class _LoginPage extends State<LoginPage> {
   TextEditingController tEmail = TextEditingController(text: "");
   TextEditingController tPassword = TextEditingController(text: "");
+
+  late String standId;
+  Future<dynamic> signIn(String email, String password) async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      UserCredential user = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      final userData = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(user.user!.uid)
+          .get();
+      var data = jsonDecode(jsonEncode(userData.data()));
+      var logedUser = user.user;
+      if (logedUser != null) await prefs.setString("userUid", logedUser.uid);
+      if (data['role'] == 'seller') standId = data['standId'];
+      return data;
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +127,11 @@ class _LoginPage extends State<LoginPage> {
                                   MaterialPageRoute(
                                       builder: (context) => home()));
                             } else if (res['role'] == 'seller') {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SellerMenu(standId: standId)));
+                            } else if(res['role'] == 'admin') {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

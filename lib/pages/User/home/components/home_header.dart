@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../pages/addStand.dart';
+import 'package:qanteen/pages/User/cart.dart';
 import 'Body.dart';
 import 'icon_btn_with_counter.dart';
 import 'search_field.dart';
@@ -26,7 +26,7 @@ class HomeHeader extends StatelessWidget {
             iconSrc: Icons.shopping_cart,
             press: () {
               // TODO: delete this
-              Navigator.push(context, MaterialPageRoute(builder: (context) => AddStand()));
+              Navigator.push(context, MaterialPageRoute(builder: (builder) => Cart()));
             },
             numOfItems: 7,
           )

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:qanteen/pages/User/nota.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailOrder extends StatefulWidget {
@@ -26,6 +27,14 @@ class _DetailOrder extends State<DetailOrder> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Detail Order"),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (builder) => Nota(timeOrder: timeOrder)));
+              },
+              icon: Icon(Icons.inventory_outlined),
+          )
+        ],
       ),
       body: FutureBuilder(
         future: getDetailOrder(timeOrder),
@@ -56,7 +65,7 @@ class _DetailOrder extends State<DetailOrder> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text("Total : ${details.data!.data()!['total'].toString()}"),
-                                    Text("Price : ${details.data!.data()!['menuPrice'].toString()}"),
+                                    Text("Total Price : ${details.data!.data()!['menuPrice'] * details.data!.data()!['total']}"),
                                     Text("Stand : ${details.data!.data()!['standName']}"),
                                   ],
                                 ),

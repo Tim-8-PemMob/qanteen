@@ -1,28 +1,26 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:qanteen/pages/addMenu.dart';
-import 'package:qanteen/pages/cart.dart';
-import 'package:qanteen/pages/editMenu.dart';
-import 'package:qanteen/pages/editStand.dart';
+import 'package:qanteen/model/menu_model.dart';
+import 'package:qanteen/pages/Seller/addMenu.dart';
+import 'package:qanteen/pages/User/cart.dart';
+import 'package:qanteen/pages/Seller/editMenu.dart';
+import 'package:qanteen/pages/Admin/editStand.dart';
+import 'package:qanteen/pages/Seller/standOrder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../model/menu_model.dart';
-import 'standOrder.dart';
 
-class Menu extends StatefulWidget {
+class SellerMenu extends StatefulWidget {
   final String standId;
 
-  Menu({required this.standId});
+  SellerMenu({required this.standId});
   @override
-  _Menu createState() => _Menu(standId: standId);
+  _SellerMenu createState() => _SellerMenu(standId: standId);
 }
 
-class _Menu extends State<Menu> {
+class _SellerMenu extends State<SellerMenu> {
   final String standId;
 
-  _Menu({required this.standId});
+  _SellerMenu({required this.standId});
 
   String capitalizeAllWord(String value) {
     var result = value[0].toUpperCase();
@@ -183,27 +181,9 @@ class _Menu extends State<Menu> {
         title: Text("Menu, ${standName}"),
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => EditStand(standId: standId)))
-                  .then((msg) => setState(() {
-                        getStandById(standId);
-                        var snackBar = SnackBar(content: Text(msg));
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }));
-            },
-            icon: const Icon(Icons.edit),
-          ),
-          IconButton(
-              onPressed: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => Cart())),
-              icon: Icon(Icons.shopping_cart)),
-          IconButton(
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => StandOrder(standId: standId))),
-              icon: Icon(Icons.production_quantity_limits)),
+              icon: Icon(Icons.menu_book)),
         ],
       ),
       body: FutureBuilder(
@@ -295,18 +275,6 @@ class _Menu extends State<Menu> {
                                                   .showSnackBar(snackBar);
                                             });
                                           });
-                                        } else if (value == 3) {
-                                          // ubah total
-                                          addCart(standId, data[index].id, 1,
-                                                  standName)
-                                              .then((msg) {
-                                            setState(() {
-                                              var snackBar =
-                                                  SnackBar(content: Text(msg));
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(snackBar);
-                                            });
-                                          });
                                         }
                                       },
                                       itemBuilder: (BuildContext context) =>
@@ -317,10 +285,6 @@ class _Menu extends State<Menu> {
                                             const PopupMenuItem<int>(
                                                 value: 2,
                                                 child: const Text("Delete")),
-                                            const PopupMenuItem<int>(
-                                                value: 3,
-                                                child:
-                                                    const Text("Add To Cart"))
                                           ]),
                                 ),
                               ))));

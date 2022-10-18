@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qanteen/pages/addStand.dart';
+import 'package:qanteen/pages/Admin/addStand.dart';
 import 'package:qanteen/pages/login.dart';
 
 Future<void> signUp(
@@ -18,6 +18,7 @@ Future<void> signUp(
           .doc(user.user!.uid)
           .set({
         "name": name,
+        "role" : "user",
       });
     }
   } catch (e) {

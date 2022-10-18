@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:qanteen/home/home.dart';
-import 'package:qanteen/pages/menu.dart';
+import 'package:qanteen/pages/User/home/home.dart';
+import 'package:qanteen/pages/User/menu.dart';
 import 'package:qanteen/model/stand_model.dart';
-import 'addStand.dart';
+import 'Admin/addStand.dart';
 
 Future<List<StandModel>> getStandFireStore() async {
   var listStand = List<StandModel>.empty(growable: true);

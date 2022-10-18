@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:qanteen/home/home.dart';
 import 'package:qanteen/model/order_model.dart';
-import 'package:qanteen/pages/menu.dart';
+import 'package:qanteen/pages/User/menu.dart';
 import 'package:qanteen/model/stand_model.dart';
-import 'addStand.dart';
+import '../Admin/addStand.dart';
 
 class StandOrder extends StatefulWidget {
   final String standId;
@@ -58,7 +57,7 @@ class _StandOrder extends State<StandOrder> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Stand Makanan"),
+        title: const Text("Order"),
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Orders").snapshots(),
@@ -122,15 +121,6 @@ class _StandOrder extends State<StandOrder> {
             );
           }
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed:() {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => AddStand())).then((msg) => setState(() {
-            var snackBar = SnackBar(content: Text(msg));
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          }));
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }
