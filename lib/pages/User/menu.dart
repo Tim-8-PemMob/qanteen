@@ -95,6 +95,17 @@ class _Menu extends State<Menu> {
       "total": FieldValue.increment(totalBuy * -1),
     });
   }
+  //TODO: sebelum di tambahkan ke cart total beli dengan total menu di db online bukan dengan data yang sudah di ambil
+  //TODO: ganti en validasi e cok
+
+  Future<bool> checkTotalMenu(String standId, String menuId, int totalBuy) async {
+    await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get().then((res) {
+      if (res.data()!['total'] >= totalBuy) {
+        return true;
+      }
+    });
+    return false;
+  }
 
   Future<String> addCart(
       String standId, String menuId, int total, String standName) async {
@@ -237,7 +248,7 @@ class _Menu extends State<Menu> {
                                             FocusManager.instance.primaryFocus?.unfocus();
                                             if (textEditingControllers[data[index].id] != null) {
                                               if (int.parse(textEditingControllers[data[index].id]!.text) >= 1) {
-                                                if (int.parse(textEditingControllers[data[index].id]!.text) <= data[index].total) {
+                                                if (int.parse(textEditingControllers[data[index].id]!.text) <= data[index].total) { // TODO : <----- ganti validasinya
                                                   addCart(standId, data[index].id, int.parse(textEditingControllers[data[index].id]!.text), standName).then((msg) {
                                                     setState(() {
                                                       textEditingControllers[data[index].id]!.text = "1";
