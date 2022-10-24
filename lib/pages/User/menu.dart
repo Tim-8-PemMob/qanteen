@@ -99,12 +99,15 @@ class _Menu extends State<Menu> {
   //TODO: ganti en validasi e cok
 
   Future<bool> checkTotalMenu(String standId, String menuId, int totalBuy) async {
+    late bool result;
     await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get().then((res) {
       if (res.data()!['total'] >= totalBuy) {
-        return true;
+        result = true;
+      } else {
+        result = false;
       }
     });
-    return false;
+    return result;
   }
 
   Future<String> addCart(
@@ -244,11 +247,11 @@ class _Menu extends State<Menu> {
                                             child: textFields[index]
                                         ),
                                         IconButton(
-                                          onPressed: () {
+                                          onPressed: () async {
                                             FocusManager.instance.primaryFocus?.unfocus();
                                             if (textEditingControllers[data[index].id] != null) {
                                               if (int.parse(textEditingControllers[data[index].id]!.text) >= 1) {
-                                                if (int.parse(textEditingControllers[data[index].id]!.text) <= data[index].total) { // TODO : <----- ganti validasinya
+                                                if (await checkTotalMenu(standId, data[index].id, int.parse(textEditingControllers[data[index].id]!.text))) {
                                                   addCart(standId, data[index].id, int.parse(textEditingControllers[data[index].id]!.text), standName).then((msg) {
                                                     setState(() {
                                                       textEditingControllers[data[index].id]!.text = "1";

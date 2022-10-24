@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qanteen/pages/Admin/addStand.dart';
+import 'package:qanteen/pages/Admin/addSeller.dart';
 import 'package:qanteen/pages/index.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,12 +25,17 @@ class _LoginPage extends State<LoginPage> {
   Future<dynamic> signIn(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     try {
-      UserCredential user = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-      final userData = await FirebaseFirestore.instance
-          .collection("Users")
-          .doc(user.user!.uid)
-          .get();
+      UserCredential user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      FirebaseAuth.instance
+          .authStateChanges()
+          .listen((User? user) {
+        if (user == null) {
+          print('User is currently signed out!');
+        } else {
+          print('User is signed in!');
+        }
+      });
+      final userData = await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).get();
       var data = jsonDecode(jsonEncode(userData.data()));
       var logedUser = user.user;
       if (logedUser != null) await prefs.setString("userUid", logedUser.uid);
@@ -135,7 +140,7 @@ class _LoginPage extends State<LoginPage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => AddStand()));
+                                      builder: (context) => AddSeller()));
                             }
                           } else {
                             var snackBar = SnackBar(

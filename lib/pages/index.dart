@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:qanteen/pages/User/home/home.dart';
 import 'package:qanteen/pages/User/menu.dart';
 import 'package:qanteen/model/stand_model.dart';
-import 'Admin/addStand.dart';
+import 'Admin/addSeller.dart';
 
 Future<List<StandModel>> getStandFireStore() async {
   var listStand = List<StandModel>.empty(growable: true);
@@ -85,7 +85,7 @@ class _Index extends State<Index> {
       ),
       floatingActionButton: FloatingActionButton(
           onPressed:() {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => AddStand())).then((msg) => setState(() {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AddSeller())).then((msg) => setState(() {
               var snackBar = SnackBar(content: Text(msg));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
             }));
