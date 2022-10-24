@@ -53,6 +53,8 @@ class _StandOrder extends State<StandOrder> {
     });
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,9 +82,6 @@ class _StandOrder extends State<StandOrder> {
                       borderRadius: const BorderRadius.all(Radius.circular(12)),
                     ),
                     child: InkWell(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => Menu(standId : data[index].id)));
-                        },
                         child: SizedBox (
                             height: 100,
                             child: Center (
@@ -98,12 +97,20 @@ class _StandOrder extends State<StandOrder> {
                                         Text(data['status'])
                                       ],
                                     ),
-                                  trailing: IconButton(
+                                  trailing: (data['status'] == "Pending")?
+                                  IconButton(
                                     onPressed: () {
                                       changeStatus(data.id, "Process");
                                     },
                                     icon: Icon(Icons.check) ,
-                                  ),
+                                  ) : (data['status'] == "Process")?
+                                  IconButton(
+                                    onPressed: () {
+                                      changeStatus(data.id, "Finished");
+                                    },
+                                    icon: Icon(Icons.attach_money) ,
+                                  )
+                                  : Text("Ready"),
                                 )
                             )
                         )

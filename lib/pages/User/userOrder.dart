@@ -43,8 +43,8 @@ class _UserOrder extends State<UserOrder> {
   }
 
   Future<int> countOrder(Timestamp timeOrder) async {
-    QuerySnapshot docSnap = await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").where('timeOrder', isEqualTo: timeOrder).get();
-    List<DocumentSnapshot> orderSnapshot = docSnap.docs;
+    QuerySnapshot querySnap = await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").where('timeOrder', isEqualTo: timeOrder).get();
+    List<DocumentSnapshot> orderSnapshot = querySnap.docs;
     print(orderSnapshot.length);
     return orderSnapshot.length;
   }
@@ -82,7 +82,11 @@ class _UserOrder extends State<UserOrder> {
                     ),
                     child: InkWell(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (builder) => DetailOrder(timeOrder: snapshot.data![index])));
+                          Navigator.push(context, MaterialPageRoute(builder: (builder) => DetailOrder(timeOrder: snapshot.data![index]))).then((value) {
+                            setState(() {
+
+                            });
+                          });
                         },
                         child: SizedBox (
                             height: 80,
