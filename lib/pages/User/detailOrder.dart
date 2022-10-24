@@ -21,7 +21,12 @@ class _DetailOrder extends State<DetailOrder> {
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");
 
-    return await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").where('timeOrder', isEqualTo: timeOrder).get();
+    return await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(userUid)
+        .collection("Orders")
+        .where('timeOrder', isEqualTo: timeOrder)
+        .get();
   }
 
   Future<void> CompleteOrder(String orderId, String userName, String standId, String menuId, String namaStand, String namaMenu, int jumlahMenu, int hargaMenu) async {
@@ -92,20 +97,24 @@ class _DetailOrder extends State<DetailOrder> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.redAccent,
         title: Text("Detail Order"),
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (builder) => Nota(timeOrder: timeOrder)));
-              },
-              icon: Icon(Icons.inventory_outlined),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (builder) => Nota(timeOrder: timeOrder)));
+            },
+            icon: Icon(Icons.inventory_outlined),
           )
         ],
       ),
       body: FutureBuilder(
         future: getDetailOrder(timeOrder),
         builder: (context, snapshot) {
-          if(snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: CircularProgressIndicator(),
             );

@@ -15,7 +15,6 @@ class EditMenu extends StatefulWidget {
 }
 
 class _EditMenu extends State<EditMenu> {
-
   final String standId, menuId;
 
   _EditMenu({required this.standId, required this.menuId});
@@ -54,7 +53,7 @@ class _EditMenu extends State<EditMenu> {
 
   Future deleteFile(String standId, String menuId) async {
     final storageRef = FirebaseStorage.instance.ref();
-    
+
     final imgDelete = storageRef.child("${standId}/${menuId}");
     await imgDelete.delete().then((msg) {
       print("Berhasil");
@@ -65,7 +64,13 @@ class _EditMenu extends State<EditMenu> {
 
   // jika ganti nama tanpa ganti gambar nantinya saat ganti gambar maka gambar lama tidak terhapus
   Future getMenuById(String standId, String menuId) async {
-    await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get().then((data) {
+    await FirebaseFirestore.instance
+        .collection("Stands")
+        .doc(standId)
+        .collection("Menus")
+        .doc(menuId)
+        .get()
+        .then((data) {
       var menu = data.data();
       if (menu != null) {
         setState(() {
@@ -78,7 +83,8 @@ class _EditMenu extends State<EditMenu> {
     });
   }
 
-  Future<String> editMenu(File? image, String standId, String oldImageURL, String menuId) async {
+  Future<String> editMenu(
+      File? image, String standId, String oldImageURL, String menuId) async {
     // jika gambar di ganti : upload gambar terlebih dahulu lalu ambil urlnya dan dimasukkan ke dalam db
     late String message;
     print("image null ?? : ${image}");
@@ -86,22 +92,32 @@ class _EditMenu extends State<EditMenu> {
 
     if (oldImageURL == "") {
       await fileUpload(image!, standId, menuId).then((url) {
-        FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).update({
-          "name" : tName.text,
-          "price" : int.parse(tPrice.text),
-          "total" : int.parse(tTotal.text),
-          "image" : url,
+        FirebaseFirestore.instance
+            .collection("Stands")
+            .doc(standId)
+            .collection("Menus")
+            .doc(menuId)
+            .update({
+          "name": tName.text,
+          "price": int.parse(tPrice.text),
+          "total": int.parse(tTotal.text),
+          "image": url,
         });
         message = "Menu Berhasil di Edit";
       }, onError: (e) {
         message = "Terjadi Error : ${e}";
       });
     } else {
-      await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).update({
-        "name" : tName.text,
-        "price" : int.parse(tPrice.text),
-        "total" : int.parse(tTotal.text),
-        "image" : oldImageURL,
+      await FirebaseFirestore.instance
+          .collection("Stands")
+          .doc(standId)
+          .collection("Menus")
+          .doc(menuId)
+          .update({
+        "name": tName.text,
+        "price": int.parse(tPrice.text),
+        "total": int.parse(tTotal.text),
+        "image": oldImageURL,
       }).then((msg) {
         message = "Menu Berhasil di Edit";
       }, onError: (e) {
@@ -125,66 +141,59 @@ class _EditMenu extends State<EditMenu> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Menu"),
+        backgroundColor: Colors.redAccent,
       ),
       body: Center(
         child: Row(
           children: [
             Expanded(
                 child: Column(
-                  children: [
-                    IconButton(
-                        onPressed: () => getImagePath(),
-                        icon: const Icon(Icons.image)
-                    ),
-                  (oldImage == "" && img != null)?
-                    Image(
-                      height: MediaQuery.of(context).size.height/5 ,
-                      width: MediaQuery.of(context).size.height ,
-                      image: FileImage(img))
-                    : (oldImage == "" && img == null)?
-                      CircularProgressIndicator()
-                    : Image(
-                      height: MediaQuery.of(context).size.height/5 ,
-                      width: MediaQuery.of(context).size.height ,
-                      image: NetworkImage(oldImage)),
-                    TextField(
-                      controller: tName,
-                      decoration: const InputDecoration(
-                          hintText: "Nama Baru Menu",
-                          labelText: "Nama Menu"
-                      ),
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: tPrice,
-                      decoration: const InputDecoration(
-                          hintText: "Harga Baru Menu",
-                          labelText: "Harga Menu"
-                      ),
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: tTotal,
-                      decoration: const InputDecoration(
-                          hintText: "Total Prosi Menu",
-                          labelText: "Total Menu"
-                      ),
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          editMenu(img, standId, oldImage, menuId).then((msg) {
-                            var snackBar = SnackBar(content: Text(msg));
-                            if (msg == "Menu Berhasil di Edit") {
-                              Navigator.pop(context, msg);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                            }
-                          });
-                        },
-                        child: const Text("Edit Menu")
-                    )
-                  ],
-                ))
+              children: [
+                IconButton(
+                    onPressed: () => getImagePath(),
+                    icon: const Icon(Icons.image)),
+                (oldImage == "" && img != null)
+                    ? Image(
+                        height: MediaQuery.of(context).size.height / 5,
+                        width: MediaQuery.of(context).size.height,
+                        image: FileImage(img))
+                    : (oldImage == "" && img == null)
+                        ? CircularProgressIndicator()
+                        : Image(
+                            height: MediaQuery.of(context).size.height / 5,
+                            width: MediaQuery.of(context).size.height,
+                            image: NetworkImage(oldImage)),
+                TextField(
+                  controller: tName,
+                  decoration: const InputDecoration(
+                      hintText: "Nama Baru Menu", labelText: "Nama Menu"),
+                ),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  controller: tPrice,
+                  decoration: const InputDecoration(
+                      hintText: "Harga Baru Menu", labelText: "Harga Menu"),
+                ),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  controller: tTotal,
+                  decoration: const InputDecoration(
+                      hintText: "Total Prosi Menu", labelText: "Total Menu"),
+                ),
+                TextButton(
+                    onPressed: () {
+                      editMenu(img, standId, oldImage, menuId).then((msg) {
+                        var snackBar = SnackBar(content: Text(msg));
+                        if (msg == "Menu Berhasil di Edit") {
+                          Navigator.pop(context, msg);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      });
+                    },
+                    child: const Text("Edit Menu"))
+              ],
+            ))
           ],
         ),
       ),

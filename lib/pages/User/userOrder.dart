@@ -20,7 +20,13 @@ class _UserOrder extends State<UserOrder> {
   Future<List> getUserOrder() async {
     var map = Map();
     List uniqueTime = [];
-    await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").orderBy('timeOrder', descending: false).get().then((data) {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(userUid)
+        .collection("Orders")
+        .orderBy('timeOrder', descending: false)
+        .get()
+        .then((data) {
       // data.docs.map((e) {
       //   if(!map.containsKey(e.data()['timeOrder'])) {
       //     map[e.data()['timeOrder']] = 1;
@@ -28,12 +34,10 @@ class _UserOrder extends State<UserOrder> {
       //     map[e.data()['timeOrder']] += 1;
       //   }
       // }).toList();
-      for(var doc in data.docs) {
-        if(!uniqueTime.contains(doc.data()['timeOrder'])) {
+      for (var doc in data.docs) {
+        if (!uniqueTime.contains(doc.data()['timeOrder'])) {
           uniqueTime.add(doc.data()['timeOrder']);
-        } else {
-
-        }
+        } else {}
       }
       print(uniqueTime);
     });
@@ -43,7 +47,12 @@ class _UserOrder extends State<UserOrder> {
   }
 
   Future<int> countOrder(Timestamp timeOrder) async {
-    QuerySnapshot querySnap = await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").where('timeOrder', isEqualTo: timeOrder).get();
+    QuerySnapshot querySnap = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(userUid)
+        .collection("Orders")
+        .where('timeOrder', isEqualTo: timeOrder)
+        .get();
     List<DocumentSnapshot> orderSnapshot = querySnap.docs;
     print(orderSnapshot.length);
     return orderSnapshot.length;
@@ -52,72 +61,73 @@ class _UserOrder extends State<UserOrder> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Your Order"),
-      ),
-      body: FutureBuilder(
-        future: getUserOrder(),
-        builder: (context, snapshot) {
-          getUserOrder();
-          if(snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if(snapshot.hasError) {
-            return Center(
-              child: const Text("Error"),
-            );
-          } else if(snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                // DocumentSnapshot data = snapshot.data!.docs[index];
-                return Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: Theme.of(context).colorScheme.outline,
+        appBar: AppBar(
+          title: Text("Your Order"),
+          backgroundColor: Colors.redAccent,
+        ),
+        body: FutureBuilder(
+          future: getUserOrder(),
+          builder: (context, snapshot) {
+            getUserOrder();
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: const Text("Error"),
+              );
+            } else if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  // DocumentSnapshot data = snapshot.data!.docs[index];
+                  return Card(
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(12)),
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(12)),
-                    ),
-                    child: InkWell(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (builder) => DetailOrder(timeOrder: snapshot.data![index]))).then((value) {
-                            setState(() {
-
+                      child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (builder) => DetailOrder(
+                                            timeOrder: snapshot.data![index])))
+                                .then((value) {
+                              setState(() {});
                             });
-                          });
-                        },
-                        child: SizedBox (
-                            height: 80,
-                            child: Center (
-                                child : ListTile(
-                                  leading: const Icon(Icons.food_bank),
-                                  title: Text("Order ${index + 1}"),
-                                  subtitle: FutureBuilder(
-                                    future: countOrder(snapshot.data![index]),
-                                    builder: (context, order) {
-                                      if(order.hasData) {
-                                        return Text("Total Menu : ${order.data}");
-                                      } else {
-                                        return Text("Total Menu : ...");
-                                      }
-                                    },
-                                  )
-                                )
-                            )
-                        )
-                    )
-                );
-              },
-            );
-          } else {
-            return Center(
-              child: const Text("Empty"),
-            );
-          }
-        },
-      )
-    );
+                          },
+                          child: SizedBox(
+                              height: 80,
+                              child: Center(
+                                  child: ListTile(
+                                      leading: const Icon(Icons.food_bank),
+                                      title: Text("Order ${index + 1}"),
+                                      subtitle: FutureBuilder(
+                                        future:
+                                            countOrder(snapshot.data![index]),
+                                        builder: (context, order) {
+                                          if (order.hasData) {
+                                            return Text(
+                                                "Total Menu : ${order.data}");
+                                          } else {
+                                            return Text("Total Menu : ...");
+                                          }
+                                        },
+                                      ))))));
+                },
+              );
+            } else {
+              return Center(
+                child: const Text("Empty"),
+              );
+            }
+          },
+        ));
   }
 }

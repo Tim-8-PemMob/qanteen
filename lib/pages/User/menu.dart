@@ -31,11 +31,10 @@ class _Menu extends State<Menu> {
     return result;
   }
 
-  Map<String,TextEditingController> textEditingControllers = {};
+  Map<String, TextEditingController> textEditingControllers = {};
   var textFields = <TextField>[];
 
   Future<List<MenuModel>> getMenuFireStore(String standId) async {
-
     var listStand = List<MenuModel>.empty(growable: true);
 
     await FirebaseFirestore.instance
@@ -59,8 +58,8 @@ class _Menu extends State<Menu> {
 
     listStand.forEach((str) {
       var textEditingController = new TextEditingController(text: "1");
-      textEditingControllers.putIfAbsent(str.id, ()=>textEditingController);
-      return textFields.add( TextField(
+      textEditingControllers.putIfAbsent(str.id, () => textEditingController);
+      return textFields.add(TextField(
         controller: textEditingController,
         textAlign: TextAlign.center,
       ));
@@ -98,9 +97,16 @@ class _Menu extends State<Menu> {
   //TODO: sebelum di tambahkan ke cart total beli dengan total menu di db online bukan dengan data yang sudah di ambil
   //TODO: ganti en validasi e cok
 
-  Future<bool> checkTotalMenu(String standId, String menuId, int totalBuy) async {
+  Future<bool> checkTotalMenu(
+      String standId, String menuId, int totalBuy) async {
     late bool result;
-    await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get().then((res) {
+    await FirebaseFirestore.instance
+        .collection("Stands")
+        .doc(standId)
+        .collection("Menus")
+        .doc(menuId)
+        .get()
+        .then((res) {
       if (res.data()!['total'] >= totalBuy) {
         result = true;
       } else {
@@ -172,6 +178,7 @@ class _Menu extends State<Menu> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Menu, ${standName}"),
+        backgroundColor: Colors.redAccent,
         actions: [
           IconButton(
               onPressed: () => Navigator.of(context)
@@ -239,48 +246,90 @@ class _Menu extends State<Menu> {
                                           "Rp. ${data[index].price.toString()}"),
                                     ],
                                   ),
-                                    trailing: (data[index].total >= 1) ? Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(
-                                            width: 60,
-                                            child: textFields[index]
-                                        ),
-                                        IconButton(
-                                          onPressed: () async {
-                                            FocusManager.instance.primaryFocus?.unfocus();
-                                            if (textEditingControllers[data[index].id] != null) {
-                                              if (int.parse(textEditingControllers[data[index].id]!.text) >= 1) {
-                                                if (await checkTotalMenu(standId, data[index].id, int.parse(textEditingControllers[data[index].id]!.text))) {
-                                                  addCart(standId, data[index].id, int.parse(textEditingControllers[data[index].id]!.text), standName).then((msg) {
-                                                    setState(() {
-                                                      textEditingControllers[data[index].id]!.text = "1";
-                                                      var snackBar =
-                                                      SnackBar(content: Text(msg));
-                                                      ScaffoldMessenger.of(context)
-                                                          .showSnackBar(snackBar);
-                                                    });
-                                                  });
+                                  trailing: (data[index].total >= 1)
+                                      ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            SizedBox(
+                                                width: 60,
+                                                child: textFields[index]),
+                                            IconButton(
+                                              onPressed: () async {
+                                                FocusManager
+                                                    .instance.primaryFocus
+                                                    ?.unfocus();
+                                                if (textEditingControllers[
+                                                        data[index].id] !=
+                                                    null) {
+                                                  if (int.parse(
+                                                          textEditingControllers[
+                                                                  data[index]
+                                                                      .id]!
+                                                              .text) >=
+                                                      1) {
+                                                    if (await checkTotalMenu(
+                                                        standId,
+                                                        data[index].id,
+                                                        int.parse(
+                                                            textEditingControllers[
+                                                                    data[index]
+                                                                        .id]!
+                                                                .text))) {
+                                                      addCart(
+                                                              standId,
+                                                              data[index].id,
+                                                              int.parse(textEditingControllers[
+                                                                      data[index]
+                                                                          .id]!
+                                                                  .text),
+                                                              standName)
+                                                          .then((msg) {
+                                                        setState(() {
+                                                          textEditingControllers[
+                                                                  data[index]
+                                                                      .id]!
+                                                              .text = "1";
+                                                          var snackBar =
+                                                              SnackBar(
+                                                                  content: Text(
+                                                                      msg));
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                                  snackBar);
+                                                        });
+                                                      });
+                                                    } else {
+                                                      var snackBar = SnackBar(
+                                                          content: Text(
+                                                              "Total Melebihi Total Menu"));
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                              snackBar);
+                                                    }
+                                                  } else {
+                                                    var snackBar = SnackBar(
+                                                        content: Text(
+                                                            "Total Tidak Boleh Dibawah 1"));
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(snackBar);
+                                                  }
                                                 } else {
-                                                  var snackBar = SnackBar(content: Text("Total Melebihi Total Menu"));
+                                                  var snackBar = SnackBar(
+                                                      content: Text(
+                                                          "Total Tidak Boleh Kosong"));
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(snackBar);
                                                 }
-                                              } else{
-                                                var snackBar = SnackBar(content: Text("Total Tidak Boleh Dibawah 1"));
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(snackBar);
-                                              }
-                                            } else {
-                                              var snackBar = SnackBar(content: Text("Total Tidak Boleh Kosong"));
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(snackBar);
-                                            }
-                                          },
-                                          icon: Icon(Icons.add_shopping_cart),
-                                        ),
-                                      ],
-                                    ) : const Text("Menu Habis"),
+                                              },
+                                              icon:
+                                                  Icon(Icons.add_shopping_cart),
+                                            ),
+                                          ],
+                                        )
+                                      : const Text("Menu Habis"),
                                 ),
                               ))));
                 });
