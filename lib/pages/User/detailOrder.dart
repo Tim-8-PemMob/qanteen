@@ -73,16 +73,11 @@ class _DetailOrder extends State<DetailOrder> {
       if (complete == orderTotal) {
         print("Delete All");
         await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").where('timeOrder', isEqualTo: timeOrder).get().then((data) async {
-          int total = data.docs.length;
           for(var doc in data.docs) {
             await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").doc(doc.id).delete();
             await FirebaseFirestore.instance.doc(doc.data()!['refOrder'].path).delete();
-            total--;
-            print(total);
-            if(total == 1) {
-              Navigator.pop(context);
-            }
           }
+          Navigator.pop(context);
         });
       }
     });
@@ -123,7 +118,12 @@ class _DetailOrder extends State<DetailOrder> {
                               return Center(
                                 child: CircularProgressIndicator(),
                               );
-                            } else {
+                            } else if(!details.hasData || details.data == null || details.data!.data() == null) {
+                              return Center(
+                                child: Text("..."),
+                              );
+                            }
+                            else {
                               return ListTile(
                                 leading: const Icon(Icons.food_bank),
                                 title: Text(details.data!.data()!['menuName']),
