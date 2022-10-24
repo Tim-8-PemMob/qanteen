@@ -67,9 +67,31 @@ class _StandOrder extends State<StandOrder> {
         appBar: AppBar(
           title: const Text("Order"),
           backgroundColor: Colors.redAccent,
-          bottom: TabBar(tabs: [
-            
-          ]),
+          bottom: TabBar(
+            tabs: [
+              Tab(
+                child: Text(
+                  "Pesanan Masuk",
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Tab(
+                child: Text(
+                  "Sedang diproses",
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Tab(
+                child: Text(
+                  "Pesanan Selesai",
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
         ),
         body: StreamBuilder(
           stream: FirebaseFirestore.instance
@@ -134,6 +156,12 @@ class _StandOrder extends State<StandOrder> {
                                           : Text("Ready"),
                                 )))));
                   },
+                ),
+                Center(
+                  child: Text("Pesanan diproses"),
+                ),
+                Center(
+                  child: Text("Pesanan Selesai"),
                 ),
               ]);
             } else if (snapshot.hasError) {
