@@ -47,16 +47,23 @@ class _AddMenu extends State<AddMenu> {
 
   Future<String> inputMenu(String standId, File imgPath) async {
     late String message;
-    await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").add({
-      "image" : "placeholder",
-      "name" : tName.text.toString(),
-      "price" : int.parse(tPrice.text),
-      "total" : int.parse(tTotal.text),
+    await FirebaseFirestore.instance
+        .collection("Stands")
+        .doc(standId)
+        .collection("Menus")
+        .add({
+      "image": "placeholder",
+      "name": tName.text.toString(),
+      "price": int.parse(tPrice.text),
+      "total": int.parse(tTotal.text),
     }).then((res) async {
       await fileUpload(imgPath, standId, res.id).then((url) async {
-        await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(res.id).update({
-          "image" : url
-        });
+        await FirebaseFirestore.instance
+            .collection("Stands")
+            .doc(standId)
+            .collection("Menus")
+            .doc(res.id)
+            .update({"image": url});
         message = "Menu Berhasil di Tambahkan";
       }, onError: (e) {
         message = "Terjadi Error : ${e}";
@@ -70,64 +77,66 @@ class _AddMenu extends State<AddMenu> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Input Menu"),
+        backgroundColor: Colors.redAccent,
       ),
       body: Center(
         child: Row(
           children: [
             Expanded(
                 child: Column(
-                  children: [
-                    IconButton(
-                        onPressed: () => getImagePath(),
-                        icon: const Icon(Icons.image)
-                    ),
-                    (image != null)?Image(
-                        height: MediaQuery.of(context).size.height/5 ,
-                        width: MediaQuery.of(context).size.height ,
-                        image: FileImage(image!)
-                    ):const Text("Image is Empty"),
-                    TextField(
-                      controller: tName,
-                      decoration: const InputDecoration(
-                        hintText: "Nama Menu Anda",
-                        labelText: "Nama Menu",
-                      ),
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: tPrice,
-                      decoration: const InputDecoration(
-                        hintText: "Harga Menu Anda",
-                        labelText: "Harga Menu"
-                      ),
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: tTotal,
-                      decoration: const InputDecoration(
-                          hintText: "Total Prosi Yang Anda Jual",
-                          labelText: "Total Menu"
-                      ),
-                    ),
-                    TextButton(
-                        onPressed: () async {
-                          if (tName.text.isNotEmpty && tPrice.text.isNotEmpty && tTotal.text.isNotEmpty && image != null){
-                            inputMenu(standId, image!).then((msg) {
-                              var snackBar = SnackBar(content: Text(msg));
-                              if (msg == "Menu Berhasil di Tambahkan") {
-                                Navigator.pop(context, msg);
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                              }
-                            });
+              children: [
+                IconButton(
+                    onPressed: () => getImagePath(),
+                    icon: const Icon(Icons.image)),
+                (image != null)
+                    ? Image(
+                        height: MediaQuery.of(context).size.height / 5,
+                        width: MediaQuery.of(context).size.height,
+                        image: FileImage(image!))
+                    : const Text("Image is Empty"),
+                TextField(
+                  controller: tName,
+                  decoration: const InputDecoration(
+                    hintText: "Nama Menu Anda",
+                    labelText: "Nama Menu",
+                  ),
+                ),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  controller: tPrice,
+                  decoration: const InputDecoration(
+                      hintText: "Harga Menu Anda", labelText: "Harga Menu"),
+                ),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  controller: tTotal,
+                  decoration: const InputDecoration(
+                      hintText: "Total Prosi Yang Anda Jual",
+                      labelText: "Total Menu"),
+                ),
+                TextButton(
+                    onPressed: () async {
+                      if (tName.text.isNotEmpty &&
+                          tPrice.text.isNotEmpty &&
+                          tTotal.text.isNotEmpty &&
+                          image != null) {
+                        inputMenu(standId, image!).then((msg) {
+                          var snackBar = SnackBar(content: Text(msg));
+                          if (msg == "Menu Berhasil di Tambahkan") {
+                            Navigator.pop(context, msg);
                           } else {
-                            var snackBar = SnackBar(content: Text("Tolong Masukkan Data Dengan Benar"));
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
                           }
-                        },
-                        child: const Text("Input Menu")
-                    )
-                  ],
+                        });
+                      } else {
+                        var snackBar = SnackBar(
+                            content: Text("Tolong Masukkan Data Dengan Benar"));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    },
+                    child: const Text("Input Menu"))
+              ],
             ))
           ],
         ),

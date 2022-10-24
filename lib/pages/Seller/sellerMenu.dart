@@ -179,6 +179,7 @@ class _SellerMenu extends State<SellerMenu> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Menu, ${standName}"),
+        backgroundColor: Colors.redAccent,
         actions: [
           IconButton(
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
@@ -301,6 +302,7 @@ class _SellerMenu extends State<SellerMenu> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.redAccent,
         onPressed: () {
           Navigator.push(
               context,
