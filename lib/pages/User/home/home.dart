@@ -34,7 +34,7 @@ class _homeState extends State<home> {
       bottomNavigationBar: ConvexAppBar(
         // color: Colors.redAccent,
         height: MediaQuery.of(context).size.width * 0.15,
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red[700],
         items: [
           TabItem(icon: Icons.home, title: 'Home'),
           TabItem(icon: Icons.restaurant_menu, title: 'Pesanan'),

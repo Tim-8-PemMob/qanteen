@@ -126,7 +126,7 @@ class _Body extends State<Body> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          mainAxisExtent: 280,
+                          mainAxisExtent: 230,
                         ),
                         itemCount: data.length,
                         itemBuilder: (context, index) {

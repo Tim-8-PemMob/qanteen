@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qanteen/pages/User/home/components/SizeConfig.dart';
 import 'package:qanteen/pages/User/menu.dart';
 
 class StandContainer extends StatelessWidget {
@@ -17,6 +18,7 @@ class StandContainer extends StatelessWidget {
   final String standId;
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return Container(
         height: 270,
         width: 200,
@@ -76,21 +78,21 @@ class StandContainer extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(
-                      height: 8.0,
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(CupertinoIcons.heart),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(CupertinoIcons.cart),
-                        )
-                      ],
-                    )
+                    // const SizedBox(
+                    //   height: getProportionateScreenWidth(7),
+                    // ),
+                    // Row(
+                    //   children: [
+                    //     IconButton(
+                    //       onPressed: () {},
+                    //       icon: Icon(CupertinoIcons.heart),
+                    //     ),
+                    //     IconButton(
+                    //       onPressed: () {},
+                    //       icon: Icon(CupertinoIcons.cart),
+                    //     )
+                    //   ],
+                    // )
                   ],
                 ),
               )
