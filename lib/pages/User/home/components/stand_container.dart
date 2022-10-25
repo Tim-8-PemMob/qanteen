@@ -22,14 +22,14 @@ class StandContainer extends StatelessWidget {
     return Container(
         height: 270,
         width: 200,
-        margin: EdgeInsets.all(8),
+        margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Color.fromARGB(104, 82, 82, 82),
-              offset: const Offset(
+              offset: Offset(
                 5.0,
                 5.0,
               ),
@@ -38,7 +38,7 @@ class StandContainer extends StatelessWidget {
             ), //BoxShadow
             BoxShadow(
               color: Colors.white,
-              offset: const Offset(0.0, 0.0),
+              offset: Offset(0.0, 0.0),
               blurRadius: 0.0,
               spreadRadius: 0.0,
             ),
@@ -73,7 +73,7 @@ class StandContainer extends StatelessWidget {
                   children: [
                     Text(
                       namaStand,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
                       ),

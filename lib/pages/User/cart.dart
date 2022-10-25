@@ -109,7 +109,7 @@ class _Cart extends State<Cart> {
         .doc(cartDocId)
         .delete()
         .then((value) async {
-      await increasePortion(standId, menuId, totalReduce);
+      await changePortionMenu(standId, menuId, totalReduce);
       message = "Menu Berhasil Dihapus Dari Cart";
     }, onError: (e) {
       message = "Terjadi Kelasalahn ${e}";
@@ -117,8 +117,7 @@ class _Cart extends State<Cart> {
     return message;
   }
 
-  Future<void> increasePortion(
-      String standId, String menuId, int totalBuy) async {
+  Future<void> changePortionMenu(String standId, String menuId, int totalBuy) async {
     await FirebaseFirestore.instance
         .collection("Stands")
         .doc(standId)
@@ -129,8 +128,8 @@ class _Cart extends State<Cart> {
     });
   }
 
-  Future<String> reduceTotal(
-      String standId, String menuId, String cartDocId, int totalReduce) async {
+  Future<String> changeTotalCart(String standId, String menuId, String cartDocId, int total) async {
+    print("total : ${total}");
     late String message;
     await FirebaseFirestore.instance
         .collection("Users")
@@ -139,60 +138,47 @@ class _Cart extends State<Cart> {
         .doc(cartDocId)
         .get()
         .then((data) async {
-      if (data['total'] > 1) {
-        print("inside if");
+      if (data['total'] + total >= 1) {
         await FirebaseFirestore.instance
             .collection("Users")
             .doc(userUid)
             .collection("Cart")
             .doc(cartDocId)
             .update({
-          "total": FieldValue.increment(totalReduce * -1),
+          "total": FieldValue.increment(total),
         }).then((res) async {
-          await increasePortion(standId, menuId, totalReduce);
-          message = "Total Menu Berhasil Di Kurangi";
+          await changePortionMenu(standId, menuId, total);
+          message = "Total Menu Berhasil Di Ubah";
         }, onError: (e) {
           message = "Terjadi Kelasalahn ${e}";
         });
       } else {
-        message = await removeCart(standId, menuId, cartDocId, 1);
+        await removeCart(standId, menuId, cartDocId, 1).then((res) {
+          message = "Menu Berhasil Di Hapus Dari Cart";
+        });
       }
     });
     return message;
   }
 
-  Future<void> PlaceOrder() async {
+  Future<String> PlaceOrder() async {
     Timestamp orderTime = Timestamp.fromDate(DateTime.now());
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");
+    late String message;
 
     late String userName, menuName;
     late int menuPrice;
-    await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(userUid)
-        .get()
-        .then((data) {
+    await FirebaseFirestore.instance.collection("Users").doc(userUid).get().then((data) {
       var user = data.data();
       if (user != null) {
         userName = user['name'];
       }
     });
 
-    await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(userUid)
-        .collection("Cart")
-        .get()
-        .then((res) async {
+    await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").get().then((res) async {
       for (var doc in res.docs) {
-        await FirebaseFirestore.instance
-            .collection("Stands")
-            .doc(doc.data()['standId'])
-            .collection("Menus")
-            .doc(doc.data()['menuId'])
-            .get()
-            .then((data) {
+        await FirebaseFirestore.instance.collection("Stands").doc(doc.data()['standId']).collection("Menus").doc(doc.data()['menuId']).get().then((data) {
           var menu = data.data();
           if (menu != null) {
             menuName = menu['name'];
@@ -201,11 +187,7 @@ class _Cart extends State<Cart> {
         });
         // masukkan data ke order collections
         // hapus semua data di cart collections
-        await FirebaseFirestore.instance
-            .collection("Stands")
-            .doc(doc.data()['standId'])
-            .collection("Orders")
-            .add({
+        await FirebaseFirestore.instance.collection("Stands").doc(doc.data()['standId']).collection("Orders").add({
           "userUid": userUid,
           "menuId": doc.data()['menuId'],
           "standId": doc.data()['standId'],
@@ -216,28 +198,22 @@ class _Cart extends State<Cart> {
           "total": doc.data()['total'],
           "status": "Pending",
         }).then((res) async {
-          await FirebaseFirestore.instance
-              .collection("Users")
-              .doc(userUid)
-              .collection("Orders")
-              .add({
+          await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").add({
             "refOrder": res,
             "timeOrder": orderTime,
           });
-          await FirebaseFirestore.instance
-              .collection("Users")
-              .doc(userUid)
-              .collection("Cart")
-              .doc(doc.id)
-              .delete();
+          await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").doc(doc.id).delete();
         });
       }
+      message = "Order Berhasil Di Kirim";
+    }, onError: (e) {
+      message = "Terjadi Kesalahan ${e}";
     });
+    return message;
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     userUid = "";
     getUserUid();
@@ -284,7 +260,7 @@ class _Cart extends State<Cart> {
                             // Navigator.push(context, MaterialPageRoute(builder: (context) => Menu(standId : data[index].id)));
                           },
                           child: SizedBox(
-                              height: 100,
+                              height: 200,
                               child: Center(
                                   child: ListTile(
                                       leading:
@@ -305,16 +281,26 @@ class _Cart extends State<Cart> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
+                                              onPressed: () {
+                                                changeTotalCart(data[index].standId, data[index].menuId, data[index].id, 1).then((msg) {
+                                                  setState(() {
+                                                    var snackBar = SnackBar(
+                                                        duration: const Duration(seconds: 2),
+                                                        content: Text(msg));
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(snackBar);
+                                                  });
+                                                });
+                                              },
+                                              icon: Icon(Icons.add_circle_outline)
+                                          ),
+                                          IconButton(
                                             onPressed: () {
-                                              setState(() {
-                                                // ganti parameter terakhir (total reduce)
-                                                reduceTotal(
-                                                        data[index].standId,
-                                                        data[index].menuId,
-                                                        data[index].id,
-                                                        1)
-                                                    .then((msg) {
+                                              changeTotalCart(data[index].standId, data[index].menuId, data[index].id, -1).then((msg) {
+                                                setState(() {
+                                                  // TODO: ganti parameter terakhir (total reduce) menjadi dinamis ???
                                                   var snackBar = SnackBar(
+                                                      duration: const Duration(seconds: 2),
                                                       content: Text(msg));
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(snackBar);
@@ -326,14 +312,10 @@ class _Cart extends State<Cart> {
                                           ),
                                           IconButton(
                                             onPressed: () {
-                                              setState(() {
-                                                removeCart(
-                                                        data[index].standId,
-                                                        data[index].menuId,
-                                                        data[index].id,
-                                                        data[index].total)
-                                                    .then((msg) {
+                                              removeCart(data[index].standId, data[index].menuId, data[index].id, data[index].total).then((msg) {
+                                                setState(() {
                                                   var snackBar = SnackBar(
+                                                      duration: const Duration(seconds: 2),
                                                       content: Text(msg));
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(snackBar);
@@ -356,7 +338,15 @@ class _Cart extends State<Cart> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.redAccent,
         onPressed: () async {
-          await PlaceOrder();
+          await PlaceOrder().then((msg) {
+            setState(() {
+              var snackBar = SnackBar(
+                  duration: const Duration(seconds: 2),
+                  content: Text(msg));
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(snackBar);
+            });
+          });
         },
         child: Icon(
           Icons.monetization_on,

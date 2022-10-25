@@ -14,7 +14,7 @@ class categoriesContainer extends StatelessWidget {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.only(left: 20),
+          margin: const EdgeInsets.only(left: 20),
           height: 80,
           width: 120,
           decoration: BoxDecoration(

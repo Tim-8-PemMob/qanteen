@@ -6,8 +6,6 @@ import 'package:qanteen/pages/User/home/components/SizeConfig.dart';
 import 'banner.dart';
 import 'categories_container.dart';
 import 'home_header.dart';
-import 'icon_btn_with_counter.dart';
-import 'search_field.dart';
 import 'stand_container.dart';
 
 Future<List<StandModel>> getStandFireStore() async {
@@ -133,7 +131,7 @@ class _Body extends State<Body> {
                           return StandContainer(
                             image: data[index].image,
                             namaStand: data[index].name,
-                            nmrStand: "${index}",
+                            nmrStand: index.toString(),
                             standId: data[index].id,
                           );
                         },

@@ -93,6 +93,7 @@ class _AddSeller extends State<AddSeller> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.redAccent,
         title: const Text("Create Stand"),
       ),
       body: Center(

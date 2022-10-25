@@ -18,8 +18,8 @@ class HomeBanner extends StatelessWidget {
             height: double.maxFinite,
             viewportFraction: 0.95,
             autoPlay: true,
-            autoPlayInterval: Duration(seconds: 3),
-            autoPlayAnimationDuration: Duration(milliseconds: 800),
+            autoPlayInterval: const Duration(seconds: 3),
+            autoPlayAnimationDuration: const Duration(milliseconds: 800),
             autoPlayCurve: Curves.easeInOut),
         items: [
           "assets/carousel_slider/gbr1.jpg",
@@ -30,7 +30,7 @@ class HomeBanner extends StatelessWidget {
             builder: (BuildContext context) {
               return Container(
                 width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.symmetric(horizontal: 5.0),
+                margin: const EdgeInsets.symmetric(horizontal: 5.0),
                 decoration: BoxDecoration(
                     color: Colors.amber,
                     image:

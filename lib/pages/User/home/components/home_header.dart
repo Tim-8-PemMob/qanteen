@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/pages/User/cart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Body.dart';
 import 'icon_btn_with_counter.dart';
 import 'search_field.dart';
 
@@ -13,24 +12,35 @@ class HomeHeader extends StatefulWidget {
 }
 
 class _HomeHeader extends State<HomeHeader> {
+  // int totalCart = 0;
+  // Future<void> countCart() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final String? userUid = prefs.getString("userUid");
+  //
+  //   QuerySnapshot docSnap = await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").get();
+  //   List<DocumentSnapshot> cartSnapshot = docSnap.docs;
+  //   setState(() {
+  //     totalCart = cartSnapshot.length;
+  //   });
+  // }
 
-  int totalCart = 0;
-  Future<void> countCart() async {
+  Stream<int> countCart() async* {
+    late int totalCart;
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");
 
-    QuerySnapshot docSnap = await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").get();
-    List<DocumentSnapshot> cartSnapshot = docSnap.docs;
-    setState(() {
-      totalCart = cartSnapshot.length;
+    await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").get().then((value) {
+      setState(() {
+        totalCart = value.docs.length;
+      });
     });
+    yield totalCart;
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    countCart();
+    // countCart();
   }
 
   @override
@@ -45,14 +55,17 @@ class _HomeHeader extends State<HomeHeader> {
         children: [
           restaurantIcon(),
           searchField(),
-          IconBtnWithCounter(
-            iconSrc: Icons.shopping_cart,
-            press: () {
-              // TODO: delete this
-              Navigator.push(context, MaterialPageRoute(builder: (builder) => Cart()));
-            },
-            numOfItems: totalCart,
-          )
+          StreamBuilder(
+            stream: countCart(),
+            builder: (context, snapshot) {
+                return IconBtnWithCounter(
+                  iconSrc: Icons.shopping_cart,
+                  press: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (builder) => Cart()));
+                  },
+                  numOfItems: snapshot.data,
+                );
+              },)
         ],
       ),
     );

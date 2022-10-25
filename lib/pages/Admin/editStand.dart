@@ -108,7 +108,6 @@ class _EditStand extends State<EditStand> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getStandById(standId);
   }
@@ -116,9 +115,9 @@ class _EditStand extends State<EditStand> {
   @override
   Widget build(BuildContext context) {
     var img = image;
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.redAccent,
         title: const Text("Edit Stands"),
         actions: [
           IconButton(
@@ -132,7 +131,7 @@ class _EditStand extends State<EditStand> {
                   }
                 });
               },
-              icon: Icon(Icons.delete)),
+              icon: const Icon(Icons.delete)),
         ],
       ),
       body: Center(
@@ -151,7 +150,7 @@ class _EditStand extends State<EditStand> {
                         width: MediaQuery.of(context).size.height ,
                         image: FileImage(img))
                         : (oldImage == "" && img == null)?
-                    CircularProgressIndicator()
+                    const CircularProgressIndicator()
                         : Image(
                         height: MediaQuery.of(context).size.height/5 ,
                         width: MediaQuery.of(context).size.height ,

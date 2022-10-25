@@ -14,12 +14,12 @@ class _homeState extends State<home> {
 
   List<Widget> widgets = [
     Body(),
-    Center(
+    const Center(
       child: Text(
         "Tampilan Pesanan",
       ),
     ),
-    Center(
+    const Center(
       child: Text(
         "Tampilan Riwayat Pesanan",
       ),
@@ -35,7 +35,7 @@ class _homeState extends State<home> {
         // color: Colors.redAccent,
         height: MediaQuery.of(context).size.width * 0.15,
         backgroundColor: Colors.red[700],
-        items: [
+        items: const [
           TabItem(icon: Icons.home, title: 'Home'),
           TabItem(icon: Icons.restaurant_menu, title: 'Pesanan'),
           TabItem(icon: Icons.history, title: 'History'),
