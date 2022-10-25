@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 class HomeBanner extends StatelessWidget {
@@ -12,79 +13,34 @@ class HomeBanner extends StatelessWidget {
           horizontal: MediaQuery.of(context).size.width * (10 / 375)),
       height: 150,
       width: double.infinity,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage('assets/banner.jpg'), fit: BoxFit.cover),
-        color: Colors.redAccent,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Container(
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(
-                            bottom:
-                                MediaQuery.of(context).size.width * (5 / 375)),
-                        width: 90,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent[400],
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(30),
-                            bottomLeft: Radius.circular(30),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Qanteen",
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                              shadows: [
-                                BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 10,
-                                    offset: Offset(3, 3))
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    "DISKON 10%",
-                    style: TextStyle(
-                      color: Colors.redAccent[400],
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 50),
-                    child: Text(
-                      "Untuk semua Jenis Makanan",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(),
-          ),
-        ],
+      child: CarouselSlider(
+        options: CarouselOptions(
+            height: double.maxFinite,
+            viewportFraction: 0.95,
+            autoPlay: true,
+            autoPlayInterval: Duration(seconds: 3),
+            autoPlayAnimationDuration: Duration(milliseconds: 800),
+            autoPlayCurve: Curves.easeInOut),
+        items: [
+          "assets/carousel_slider/gbr1.jpg",
+          "assets/carousel_slider/gbr2.jpg",
+          "assets/carousel_slider/gbr3.jpg"
+        ].map((i) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                margin: EdgeInsets.symmetric(horizontal: 5.0),
+                decoration: BoxDecoration(
+                    color: Colors.amber,
+                    image:
+                        DecorationImage(image: AssetImage(i), fit: BoxFit.fill),
+                    borderRadius: BorderRadius.circular(10)),
+                //
+              );
+            },
+          );
+        }).toList(),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/model/stand_model.dart';
+import 'package:qanteen/pages/User/home/components/SizeConfig.dart';
 import 'banner.dart';
 import 'categories_container.dart';
 import 'home_header.dart';
@@ -30,6 +31,7 @@ class Body extends StatefulWidget {
 class _Body extends State<Body> {
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -39,6 +41,24 @@ class _Body extends State<Body> {
             ),
             HomeHeader(),
             HomeBanner(),
+            SizedBox(
+              height: getProportionateScreenWidth(10),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: getProportionateScreenWidth(15),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    "Rekomendasi Menu",
+                    style: TextStyle(
+                      fontSize: getProportionateScreenWidth(18),
+                    ),
+                  )
+                ],
+              ),
+            ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(
@@ -46,27 +66,46 @@ class _Body extends State<Body> {
               child: Row(
                 children: [
                   categoriesContainer(
-                    image: "assets/restaurant.png",
-                    name: "All",
+                    image: "assets/geprek.jpg",
+                    name: "Ayam Geprek",
                   ),
                   categoriesContainer(
-                    image: "assets/restaurant.png",
-                    name: "Stand 1",
+                    image: "assets/geprek.jpg",
+                    name: "Nasi Goreng",
                   ),
                   categoriesContainer(
-                    image: "assets/restaurant.png",
-                    name: "Stand 2",
+                    image: "assets/geprek.jpg",
+                    name: "Nasi Hangus",
                   ),
                   categoriesContainer(
-                    image: "assets/restaurant.png",
+                    image: "assets/geprek.jpg",
                     name: "Stand 3",
                   ),
                   categoriesContainer(
-                    image: "assets/restaurant.png",
+                    image: "assets/geprek.jpg",
                     name: "Stand 4",
                   ),
                 ],
               ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: getProportionateScreenWidth(15),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    "Pilih Stand",
+                    style: TextStyle(
+                      fontSize: getProportionateScreenWidth(18),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              height: getProportionateScreenWidth(10),
             ),
             Container(
                 padding: EdgeInsets.symmetric(

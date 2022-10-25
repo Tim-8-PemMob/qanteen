@@ -16,25 +16,28 @@ class categoriesContainer extends StatelessWidget {
         Container(
           margin: EdgeInsets.only(left: 20),
           height: 80,
-          width: 80,
+          width: 120,
           decoration: BoxDecoration(
             image: DecorationImage(
+              fit: BoxFit.fill,
               image: AssetImage(image),
             ),
-            color: Colors.grey[200],
+            color: Colors.grey,
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 3),
-          child: Text(
-            name,
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.black,
-            ),
-          ),
-        )
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 3),
+        //   child: Text(
+        //     textAlign: TextAlign.center,
+        //     name,
+        //     style: TextStyle(
+        //       fontSize: 20,
+        //       color: Colors.black,
+
+        //     ),
+        //   ),
+        // )
       ],
     );
   }
