@@ -64,23 +64,28 @@ class _Body extends State<Body> {
               child: Row(
                 children: [
                   categoriesContainer(
-                    image: "assets/geprek.jpg",
+                    image:
+                        "https://assets.grab.com/wp-content/uploads/sites/9/2019/04/19001459/iamgeprek-blog-card.jpg",
                     name: "Ayam Geprek",
                   ),
                   categoriesContainer(
-                    image: "assets/geprek.jpg",
+                    image:
+                        "https://asset-a.grid.id/crop/0x0:0x0/700x465/photo/2019/08/07/1325166108.jpg",
                     name: "Nasi Goreng",
                   ),
                   categoriesContainer(
-                    image: "assets/geprek.jpg",
+                    image:
+                        "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80",
                     name: "Nasi Hangus",
                   ),
                   categoriesContainer(
-                    image: "assets/geprek.jpg",
+                    image:
+                        "https://cdns.klimg.com/merdeka.com/i/w/news/2021/09/08/1350400/670x335/resep-nasi-goreng-kampung-yang-enak-ala-rumahan-mudah-dibuat-rev-1.jpg",
                     name: "Stand 3",
                   ),
                   categoriesContainer(
-                    image: "assets/geprek.jpg",
+                    image:
+                        "https://images.unsplash.com/photo-1581184953963-d15972933db1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=665&q=80",
                     name: "Stand 4",
                   ),
                 ],

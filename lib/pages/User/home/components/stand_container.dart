@@ -55,17 +55,39 @@ class StandContainer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-                child: Image.network(
-                  image,
-                  height: 150,
-                  width: double.infinity,
-                  fit: BoxFit.fill,
-                ),
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                    child: Image.network(
+                      image,
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  Positioned(
+                    top: 5,
+                    left: 5,
+                    child: Container(
+                        padding: EdgeInsets.all(getProportionateScreenWidth(3)),
+                        decoration: BoxDecoration(
+                          color: Colors.red[700],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          "10% Diskon",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )),
+                  ),
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.all(8),
@@ -78,21 +100,6 @@ class StandContainer extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    // const SizedBox(
-                    //   height: getProportionateScreenWidth(7),
-                    // ),
-                    // Row(
-                    //   children: [
-                    //     IconButton(
-                    //       onPressed: () {},
-                    //       icon: Icon(CupertinoIcons.heart),
-                    //     ),
-                    //     IconButton(
-                    //       onPressed: () {},
-                    //       icon: Icon(CupertinoIcons.cart),
-                    //     )
-                    //   ],
-                    // )
                   ],
                 ),
               )

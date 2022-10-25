@@ -13,18 +13,40 @@ class categoriesContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.only(left: 20),
-          height: 80,
-          width: 120,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              fit: BoxFit.fill,
-              image: AssetImage(image),
+        Stack(
+          children: [
+            Container(
+              margin: EdgeInsets.only(left: 20),
+              height: 80,
+              width: 120,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: NetworkImage(image),
+                ),
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-            color: Colors.grey,
-            borderRadius: BorderRadius.circular(10),
-          ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                height: 30,
+                width: 30,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: Colors.red[700]),
+                child: IconButton(
+                  icon: Icon(Icons.shopping_cart),
+                  onPressed: () {
+                    print("add recommendation to cart");
+                  },
+                  color: Colors.white,
+                  padding: EdgeInsets.zero,
+                ),
+              ),
+            ),
+          ],
         ),
         // Padding(
         //   padding: const EdgeInsets.only(top: 3),
