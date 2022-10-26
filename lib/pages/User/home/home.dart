@@ -1,30 +1,31 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:qanteen/pages/User/history.dart';
 import 'package:qanteen/pages/User/profile.dart';
+import 'package:qanteen/pages/User/userOrder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'components/Body.dart';
 
 class home extends StatefulWidget {
+  final String userUid;
+  home({required this.userUid});
+
   @override
-  State<home> createState() => _homeState();
+  State<home> createState() => _homeState(userUid: userUid);
 }
 
 class _homeState extends State<home> {
+  final String userUid;
+  _homeState({required this.userUid});
+
   int currentIndex = 0;
 
-  List<Widget> widgets = [
+  late List<Widget> widgets = [
     Body(),
-    const Center(
-      child: Text(
-        "Tampilan Pesanan",
-      ),
-    ),
-    const Center(
-      child: Text(
-        "Tampilan Riwayat Pesanan",
-      ),
-    ),
-    myProfile()
+    UserOrder(userUid: userUid),
+    History(),
+    const myProfile(),
   ];
 
   @override

@@ -21,14 +21,12 @@ class _LoginPage extends State<LoginPage> {
   TextEditingController tEmail = TextEditingController(text: "");
   TextEditingController tPassword = TextEditingController(text: "");
 
-  late String standId;
+  late String standId, userUid;
   Future<dynamic> signIn(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     try {
       UserCredential user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-      FirebaseAuth.instance
-          .authStateChanges()
-          .listen((User? user) {
+      FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           print('User is currently signed out!');
         } else {
@@ -38,7 +36,10 @@ class _LoginPage extends State<LoginPage> {
       final userData = await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).get();
       var data = jsonDecode(jsonEncode(userData.data()));
       var logedUser = user.user;
-      if (logedUser != null) await prefs.setString("userUid", logedUser.uid);
+      if (logedUser != null) {
+        userUid = user.user!.uid;
+        await prefs.setString("userUid", logedUser.uid);
+      };
       if (data['role'] == 'seller') standId = data['standId'];
       return data;
     } catch (e) {
@@ -130,7 +131,7 @@ class _LoginPage extends State<LoginPage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => home()));
+                                      builder: (context) => home(userUid: userUid,)));
                             } else if (res['role'] == 'seller') {
                               Navigator.push(
                                   context,

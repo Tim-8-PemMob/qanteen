@@ -30,17 +30,17 @@ class _HomeHeader extends State<HomeHeader> {
     final String? userUid = prefs.getString("userUid");
 
     await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").get().then((value) {
-      setState(() {
-        totalCart = value.docs.length;
-      });
+      //TODO: fix memory leak ?
+        setState(() {
+          totalCart = value.docs.length;
+        });
     });
-    yield totalCart;
-  }
 
-  @override
-  void initState() {
-    super.initState();
-    // countCart();
+    // FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").snapshots().listen((event) {
+    //   totalCart = event.docs.length;
+    //   print("total cart : ${totalCart}");
+    // });
+    yield totalCart;
   }
 
   @override

@@ -60,12 +60,9 @@ class _UserOrder extends State<UserOrder> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Your Order"),
-          backgroundColor: Colors.redAccent,
-        ),
-        body: FutureBuilder(
+    return SafeArea(
+      minimum: const EdgeInsets.only(top: 50),
+       child: FutureBuilder(
           future: getUserOrder(),
           builder: (context, snapshot) {
             getUserOrder();

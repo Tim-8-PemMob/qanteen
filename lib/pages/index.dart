@@ -31,7 +31,9 @@ class _Index extends State<Index> {
         title: const Text("Stand Makanan"),
         actions: [
           IconButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => home())),
+              onPressed: () {
+
+              },
               icon: Icon(Icons.home))
         ],
       ),

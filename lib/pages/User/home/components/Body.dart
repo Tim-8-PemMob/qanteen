@@ -121,8 +121,6 @@ class _Body extends State<Body> {
                     if (snapshot.hasError) {
                       return Text(snapshot.error.toString());
                     } else if (data != null && data.isNotEmpty) {
-                      // reference();
-                      // addMenu();
                       return GridView.builder(
                         shrinkWrap: true,
                         primary: false,
