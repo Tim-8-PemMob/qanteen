@@ -179,7 +179,7 @@ class _SellerMenu extends State<SellerMenu> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Menu, ${standName}"),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red[700],
         actions: [
           IconButton(
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
@@ -243,25 +243,43 @@ class _SellerMenu extends State<SellerMenu> {
                                       SizedBox(
                                         height: 20,
                                       ),
-                                      Text("Rp. ${data[index].price.toString()}"),
-                                      (data[index].total != 0)?
-                                      Text("Sisa : ${data[index].total.toString()} Porsi")
-                                          :
-                                      const Text("Menu Habis", style: TextStyle(color: Colors.red)),
+                                      Text(
+                                          "Rp. ${data[index].price.toString()}"),
+                                      (data[index].total != 0)
+                                          ? Text(
+                                              "Sisa : ${data[index].total.toString()} Porsi")
+                                          : const Text("Menu Habis",
+                                              style:
+                                                  TextStyle(color: Colors.red)),
                                     ],
                                   ),
                                   trailing: PopupMenuButton<int>(
                                       onSelected: (value) async {
                                         if (value == 1) {
-                                          Navigator.push(context, MaterialPageRoute(builder: (builder) => EditMenu(standId: standId, menuId: data[index].id))).then((msg) => setState(() {
-                                            var snackBar = SnackBar(content: Text(msg));
-                                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                          }));
+                                          Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (builder) =>
+                                                          EditMenu(
+                                                              standId: standId,
+                                                              menuId:
+                                                                  data[index]
+                                                                      .id)))
+                                              .then((msg) => setState(() {
+                                                    var snackBar = SnackBar(
+                                                        content: Text(msg));
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(snackBar);
+                                                  }));
                                         } else if (value == 2) {
-                                          deleteMenu(standId, data[index].id).then((msg) {
+                                          deleteMenu(standId, data[index].id)
+                                              .then((msg) {
                                             setState(() {
-                                              var snackBar = SnackBar(content: Text(msg));
-                                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                              var snackBar =
+                                                  SnackBar(content: Text(msg));
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(snackBar);
                                             });
                                           });
                                         }
@@ -290,7 +308,7 @@ class _SellerMenu extends State<SellerMenu> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red[700],
         onPressed: () {
           Navigator.push(
               context,

@@ -27,6 +27,18 @@ class Body extends StatefulWidget {
 }
 
 class _Body extends State<Body> {
+  String capitalizeAllWord(String value) {
+    var result = value[0].toUpperCase();
+    for (int i = 1; i < value.length; i++) {
+      if (value[i - 1] == " ") {
+        result = result + value[i].toUpperCase();
+      } else {
+        result = result + value[i];
+      }
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -133,7 +145,7 @@ class _Body extends State<Body> {
                         itemBuilder: (context, index) {
                           return StandContainer(
                             image: data[index].image,
-                            namaStand: data[index].name,
+                            namaStand: capitalizeAllWord(data[index].name),
                             nmrStand: index.toString(),
                             standId: data[index].id,
                           );

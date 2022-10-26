@@ -178,7 +178,7 @@ class _Menu extends State<Menu> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Menu, ${standName}"),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red[700],
         actions: [
           IconButton(
               onPressed: () => Navigator.of(context)
@@ -289,11 +289,13 @@ class _Menu extends State<Menu> {
                                                                   data[index]
                                                                       .id]!
                                                               .text = "1";
-                                                          var snackBar =
-                                                              SnackBar(
-                                                                  duration: const Duration(seconds: 2),
-                                                                  content: Text(
-                                                                      msg));
+                                                          var snackBar = SnackBar(
+                                                              duration:
+                                                                  const Duration(
+                                                                      seconds:
+                                                                          2),
+                                                              content:
+                                                                  Text(msg));
                                                           ScaffoldMessenger.of(
                                                                   context)
                                                               .showSnackBar(
@@ -302,7 +304,9 @@ class _Menu extends State<Menu> {
                                                       });
                                                     } else {
                                                       var snackBar = SnackBar(
-                                                        duration: const Duration(seconds: 2),
+                                                          duration:
+                                                              const Duration(
+                                                                  seconds: 2),
                                                           content: Text(
                                                               "Total Melebihi Total Menu"));
                                                       ScaffoldMessenger.of(
@@ -312,7 +316,9 @@ class _Menu extends State<Menu> {
                                                     }
                                                   } else {
                                                     var snackBar = SnackBar(
-                                                        duration: const Duration(seconds: 2),
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 2),
                                                         content: Text(
                                                             "Total Tidak Boleh Dibawah 1"));
                                                     ScaffoldMessenger.of(
@@ -321,7 +327,8 @@ class _Menu extends State<Menu> {
                                                   }
                                                 } else {
                                                   var snackBar = SnackBar(
-                                                      duration: const Duration(seconds: 2),
+                                                      duration: const Duration(
+                                                          seconds: 2),
                                                       content: Text(
                                                           "Total Tidak Boleh Kosong"));
                                                   ScaffoldMessenger.of(context)

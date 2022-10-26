@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qanteen/pages/User/home/components/SizeConfig.dart';
 import 'package:qanteen/pages/User/userOrder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,6 +15,18 @@ class Cart extends StatefulWidget {
 class _Cart extends State<Cart> {
   late TextEditingController _controller;
   late String userUid;
+
+  String capitalizeAllWord(String value) {
+    var result = value[0].toUpperCase();
+    for (int i = 1; i < value.length; i++) {
+      if (value[i - 1] == " ") {
+        result = result + value[i].toUpperCase();
+      } else {
+        result = result + value[i];
+      }
+    }
+    return result;
+  }
 
   Future<void> getUserUid() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -117,7 +130,8 @@ class _Cart extends State<Cart> {
     return message;
   }
 
-  Future<void> changePortionMenu(String standId, String menuId, int totalBuy) async {
+  Future<void> changePortionMenu(
+      String standId, String menuId, int totalBuy) async {
     await FirebaseFirestore.instance
         .collection("Stands")
         .doc(standId)
@@ -128,7 +142,8 @@ class _Cart extends State<Cart> {
     });
   }
 
-  Future<String> changeTotalCart(String standId, String menuId, String cartDocId, int total) async {
+  Future<String> changeTotalCart(
+      String standId, String menuId, String cartDocId, int total) async {
     print("total : ${total}");
     late String message;
     await FirebaseFirestore.instance
@@ -169,16 +184,31 @@ class _Cart extends State<Cart> {
 
     late String userName, menuName;
     late int menuPrice;
-    await FirebaseFirestore.instance.collection("Users").doc(userUid).get().then((data) {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(userUid)
+        .get()
+        .then((data) {
       var user = data.data();
       if (user != null) {
         userName = user['name'];
       }
     });
 
-    await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").get().then((res) async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(userUid)
+        .collection("Cart")
+        .get()
+        .then((res) async {
       for (var doc in res.docs) {
-        await FirebaseFirestore.instance.collection("Stands").doc(doc.data()['standId']).collection("Menus").doc(doc.data()['menuId']).get().then((data) {
+        await FirebaseFirestore.instance
+            .collection("Stands")
+            .doc(doc.data()['standId'])
+            .collection("Menus")
+            .doc(doc.data()['menuId'])
+            .get()
+            .then((data) {
           var menu = data.data();
           if (menu != null) {
             menuName = menu['name'];
@@ -187,7 +217,11 @@ class _Cart extends State<Cart> {
         });
         // masukkan data ke order collections
         // hapus semua data di cart collections
-        await FirebaseFirestore.instance.collection("Stands").doc(doc.data()['standId']).collection("Orders").add({
+        await FirebaseFirestore.instance
+            .collection("Stands")
+            .doc(doc.data()['standId'])
+            .collection("Orders")
+            .add({
           "userUid": userUid,
           "menuId": doc.data()['menuId'],
           "standId": doc.data()['standId'],
@@ -198,11 +232,20 @@ class _Cart extends State<Cart> {
           "total": doc.data()['total'],
           "status": "Pending",
         }).then((res) async {
-          await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").add({
+          await FirebaseFirestore.instance
+              .collection("Users")
+              .doc(userUid)
+              .collection("Orders")
+              .add({
             "refOrder": res,
             "timeOrder": orderTime,
           });
-          await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").doc(doc.id).delete();
+          await FirebaseFirestore.instance
+              .collection("Users")
+              .doc(userUid)
+              .collection("Cart")
+              .doc(doc.id)
+              .delete();
         });
       }
       message = "Order Berhasil Di Kirim";
@@ -224,7 +267,7 @@ class _Cart extends State<Cart> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Cart"),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red[700],
         actions: [
           IconButton(
               onPressed: () {
@@ -248,6 +291,7 @@ class _Cart extends State<Cart> {
                 itemBuilder: (context, index) {
                   return Card(
                       elevation: 3,
+                      margin: EdgeInsets.all(5),
                       shape: RoundedRectangleBorder(
                         side: BorderSide(
                           color: Theme.of(context).colorScheme.outline,
@@ -260,72 +304,123 @@ class _Cart extends State<Cart> {
                             // Navigator.push(context, MaterialPageRoute(builder: (context) => Menu(standId : data[index].id)));
                           },
                           child: SizedBox(
-                              height: 200,
+                              height: 120,
                               child: Center(
-                                  child: ListTile(
-                                      leading:
-                                          Image.network(data[index].imageUrl),
-                                      title: Text(
-                                          "Menu : ${data[index].menuName.toString()}"),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
+                                child: ListTile(
+                                    leading: ClipRRect(
+                                        borderRadius: BorderRadius.circular(6),
+                                        child: Image.network(
+                                          data[index].imageUrl,
+                                          width: 85,
+                                        )),
+                                    title: Text(capitalizeAllWord(
+                                        "Menu : ${data[index].menuName.toString()}")),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          capitalizeAllWord(
                                               "Stand : ${data[index].standName.toString()}"),
-                                          Text(
-                                              "Total : ${data[index].total.toString()}")
+                                        ),
+                                        Text(
+                                            "Total : ${data[index].total.toString()}")
+                                      ],
+                                    ),
+                                    trailing: Container(
+                                      height: double.maxFinite,
+                                      child: Column(
+                                        // mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              removeCart(
+                                                      data[index].standId,
+                                                      data[index].menuId,
+                                                      data[index].id,
+                                                      data[index].total)
+                                                  .then((msg) {
+                                                setState(() {
+                                                  var snackBar = SnackBar(
+                                                      duration: const Duration(
+                                                          seconds: 2),
+                                                      content: Text(msg));
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(snackBar);
+                                                });
+                                              });
+                                            },
+                                            child: const Icon(Icons.delete),
+                                          ),
+                                          SizedBox(
+                                            height: 8,
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              InkWell(
+                                                  onTap: () {
+                                                    changeTotalCart(
+                                                            data[index].standId,
+                                                            data[index].menuId,
+                                                            data[index].id,
+                                                            1)
+                                                        .then((msg) {
+                                                      setState(() {
+                                                        var snackBar = SnackBar(
+                                                            duration:
+                                                                const Duration(
+                                                                    seconds: 2),
+                                                            content: Text(msg));
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                                snackBar);
+                                                      });
+                                                    });
+                                                  },
+                                                  child: Icon(Icons
+                                                      .add_circle_outline)),
+                                              SizedBox(
+                                                width: 15,
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  changeTotalCart(
+                                                          data[index].standId,
+                                                          data[index].menuId,
+                                                          data[index].id,
+                                                          -1)
+                                                      .then((msg) {
+                                                    setState(() {
+                                                      // TODO: ganti parameter terakhir (total reduce) menjadi dinamis ???
+                                                      var snackBar = SnackBar(
+                                                          duration:
+                                                              const Duration(
+                                                                  seconds: 2),
+                                                          content: Text(msg));
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                              snackBar);
+                                                    });
+                                                  });
+                                                },
+                                                child: const Icon(Icons
+                                                    .remove_circle_outline),
+                                              ),
+                                            ],
+                                          ),
                                         ],
                                       ),
-                                      trailing: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                              onPressed: () {
-                                                changeTotalCart(data[index].standId, data[index].menuId, data[index].id, 1).then((msg) {
-                                                  setState(() {
-                                                    var snackBar = SnackBar(
-                                                        duration: const Duration(seconds: 2),
-                                                        content: Text(msg));
-                                                    ScaffoldMessenger.of(context)
-                                                        .showSnackBar(snackBar);
-                                                  });
-                                                });
-                                              },
-                                              icon: Icon(Icons.add_circle_outline)
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              changeTotalCart(data[index].standId, data[index].menuId, data[index].id, -1).then((msg) {
-                                                setState(() {
-                                                  // TODO: ganti parameter terakhir (total reduce) menjadi dinamis ???
-                                                  var snackBar = SnackBar(
-                                                      duration: const Duration(seconds: 2),
-                                                      content: Text(msg));
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(snackBar);
-                                                });
-                                              });
-                                            },
-                                            icon: const Icon(
-                                                Icons.remove_circle_outline),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              removeCart(data[index].standId, data[index].menuId, data[index].id, data[index].total).then((msg) {
-                                                setState(() {
-                                                  var snackBar = SnackBar(
-                                                      duration: const Duration(seconds: 2),
-                                                      content: Text(msg));
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(snackBar);
-                                                });
-                                              });
-                                            },
-                                            icon: const Icon(Icons.cancel),
-                                          ),
-                                        ],
-                                      ))))));
+                                    )),
+                              ))));
                 });
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -335,21 +430,85 @@ class _Cart extends State<Cart> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.redAccent,
-        onPressed: () async {
-          await PlaceOrder().then((msg) {
-            setState(() {
-              var snackBar = SnackBar(
-                  duration: const Duration(seconds: 2),
-                  content: Text(msg));
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(snackBar);
-            });
-          });
-        },
-        child: Icon(
-          Icons.monetization_on,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      // floatingActionButton: Container(
+      //   width: getProportionateScreenWidth(300),
+      //   child: FloatingActionButton(
+      //     backgroundColor: Colors.red[700],
+      //     onPressed: () async {
+      //       await PlaceOrder().then((msg) {
+      //         setState(() {
+      //           var snackBar = SnackBar(
+      //               duration: const Duration(seconds: 2), content: Text(msg));
+      //           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      //         });
+      //       });
+      //     },
+      //     child: Container(
+      //       alignment: Alignment.center,
+      //       width: MediaQuery.of(context).size.width,
+      //       height: 300,
+      //       decoration: BoxDecoration(
+      //           color: Colors.red[700],
+      //           borderRadius: BorderRadius.all(Radius.circular(12))),
+      //       child: Row(
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         children: [
+      //           Icon(
+      //             Icons.monetization_on,
+      //           ),
+      //           Text("Check Out")
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          height: 130,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Total:",
+                    style: TextStyle(
+                      color: Colors.red[700],
+                      fontSize: 22,
+                    ),
+                  ),
+                  Text(
+                    "Rp 20.000",
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red[700],
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                alignment: Alignment.center,
+                height: 50,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.red[700],
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "Check Out",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
