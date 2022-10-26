@@ -431,38 +431,41 @@ class _Cart extends State<Cart> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      // floatingActionButton: Container(
-      //   width: getProportionateScreenWidth(300),
-      //   child: FloatingActionButton(
-      //     backgroundColor: Colors.red[700],
-      //     onPressed: () async {
-      //       await PlaceOrder().then((msg) {
-      //         setState(() {
-      //           var snackBar = SnackBar(
-      //               duration: const Duration(seconds: 2), content: Text(msg));
-      //           ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      //         });
-      //       });
-      //     },
-      //     child: Container(
-      //       alignment: Alignment.center,
-      //       width: MediaQuery.of(context).size.width,
-      //       height: 300,
-      //       decoration: BoxDecoration(
-      //           color: Colors.red[700],
-      //           borderRadius: BorderRadius.all(Radius.circular(12))),
-      //       child: Row(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           Icon(
-      //             Icons.monetization_on,
-      //           ),
-      //           Text("Check Out")
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // ),
+      floatingActionButton: Container(
+        width: getProportionateScreenWidth(300),
+        child: FloatingActionButton(
+          backgroundColor: Colors.red[700],
+          onPressed: () async {
+            await PlaceOrder().then((msg) {
+              setState(() {
+                var snackBar = SnackBar(
+                    duration: const Duration(seconds: 2), content: Text(msg));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              });
+            });
+          },
+          child: Container(
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            height: 300,
+            decoration: BoxDecoration(
+              color: Colors.red[700],
+              borderRadius: BorderRadius.all(
+                Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.monetization_on,
+                ),
+                Text("Check Out")
+              ],
+            ),
+          ),
+        ),
+      ),
       bottomNavigationBar: BottomAppBar(
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
