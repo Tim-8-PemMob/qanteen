@@ -8,29 +8,51 @@ import 'categories_container.dart';
 import 'home_header.dart';
 import 'stand_container.dart';
 
-Future<List<StandModel>> getStandFireStore() async {
-  var listStand = List<StandModel>.empty(growable: true);
-  await FirebaseFirestore.instance.collection("Stands").get().then((data) {
-    for (var doc in data.docs) {
-      StandModel standModel = StandModel(
-          id: doc.id.toString(),
-          name: doc.data()["name"],
-          image: doc.data()['image']);
-      listStand.add(standModel);
-    }
-  });
-  return listStand;
+class Body extends StatefulWidget {
+  _Body createState() => _Body();
 }
 
-Future<List<dynamic>> getRandomMenu() async {
-  List listMenuRandom = [];
-  Map mapMenu = new Map();
-  var key = FirebaseFirestore.instance.collection("Stands").doc().id;
-  while(listMenuRandom.length <= 10) {
-    await FirebaseFirestore.instance.collection("Stands").where(FieldPath.documentId , isGreaterThanOrEqualTo: key).limit(5).get().then((value) async {
-      if(value.docs.length == 0) {
-        await FirebaseFirestore.instance.collection("Stands").where(FieldPath.documentId , isLessThanOrEqualTo: key).get().then((res) async {
-          for(var data in res.docs) {
+class _Body extends State<Body> {
+
+  Future<List<StandModel>> getStandFireStore() async {
+    var listStand = List<StandModel>.empty(growable: true);
+    await FirebaseFirestore.instance.collection("Stands").get().then((data) {
+      for (var doc in data.docs) {
+        StandModel standModel = StandModel(
+            id: doc.id.toString(),
+            name: doc.data()["name"],
+            image: doc.data()['image']);
+        listStand.add(standModel);
+      }
+    });
+    return listStand;
+  }
+
+  Future<List<dynamic>> getRandomMenu() async {
+    List listMenuRandom = [];
+    Map mapMenu = new Map();
+    while(listMenuRandom.length <= 8) {
+      var key = FirebaseFirestore.instance.collection("Stands").doc().id;
+      await FirebaseFirestore.instance.collection("Stands").where(FieldPath.documentId , isGreaterThanOrEqualTo: key).limit(5).get().then((value) async {
+        if(value.docs.length == 0) {
+          await FirebaseFirestore.instance.collection("Stands").where(FieldPath.documentId , isLessThanOrEqualTo: key).limit(5).get().then((res) async {
+            for(var data in res.docs) {
+              await FirebaseFirestore.instance.collection("Stands").doc(data.id).collection('Menus').where(FieldPath.documentId, isGreaterThanOrEqualTo: key).limit(1).get().then((value) {
+                for(var menu in value.docs) {
+                  Map menuMap = new Map();
+                  menuMap['standId'] = data.id;
+                  menuMap['menuId'] = menu.id;
+                  menuMap['menuTotal'] = menu.data()!['total'];
+                  menuMap['menuImg'] = menu.data()!['image'];
+                  menuMap['menuName'] = menu.data()!['name'];
+                  menuMap['menuPrice'] = menu.data()!['price'];
+                  if(!listMenuRandom.contains(menuMap)) listMenuRandom.add(menuMap);
+                }
+              });
+            }
+          });
+        } else {
+          for(var data in value.docs) {
             await FirebaseFirestore.instance.collection("Stands").doc(data.id).collection('Menus').where(FieldPath.documentId, isGreaterThanOrEqualTo: key).limit(1).get().then((value) {
               for(var menu in value.docs) {
                 Map menuMap = new Map();
@@ -40,42 +62,31 @@ Future<List<dynamic>> getRandomMenu() async {
                 menuMap['menuImg'] = menu.data()!['image'];
                 menuMap['menuName'] = menu.data()!['name'];
                 menuMap['menuPrice'] = menu.data()!['price'];
-                listMenuRandom.add(menuMap);
+                if(!listMenuRandom.contains(menuMap)) listMenuRandom.add(menuMap);
               }
             });
           }
-        });
-      } else {
-        for(var data in value.docs) {
-          await FirebaseFirestore.instance.collection("Stands").doc(data.id).collection('Menus').where(FieldPath.documentId, isGreaterThanOrEqualTo: key).limit(1).get().then((value) {
-            for(var menu in value.docs) {
-              Map menuMap = new Map();
-              menuMap['standId'] = data.id;
-              menuMap['menuId'] = menu.id;
-              menuMap['menuTotal'] = menu.data()!['total'];
-              menuMap['menuImg'] = menu.data()!['image'];
-              menuMap['menuName'] = menu.data()!['name'];
-              menuMap['menuPrice'] = menu.data()!['price'];
-              listMenuRandom.add(menuMap);
-            }
-          });
         }
-      }
-    });
+      });
+    }
+    return listMenuRandom;
   }
-  return listMenuRandom;
-}
-
-class Body extends StatefulWidget {
-  _Body createState() => _Body();
-}
-
-class _Body extends State<Body> {
 
   @override
   void initState() {
     getRandomMenu();
     super.initState();
+  }
+  String capitalizeAllWord(String value) {
+    var result = value[0].toUpperCase();
+    for (int i = 1; i < value.length; i++) {
+      if (value[i - 1] == " ") {
+        result = result + value[i].toUpperCase();
+      } else {
+        result = result + value[i];
+      }
+    }
+    return result;
   }
 
   @override
@@ -108,34 +119,49 @@ class _Body extends State<Body> {
                 ],
               ),
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.width * (15 / 375)),
-              child: FutureBuilder(
-                future: getRandomMenu(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: Text("..."),
-                    );
-                  } else if(snapshot.hasData && snapshot.data != null) {
-                    return Row(
+            FutureBuilder(
+              future: getRandomMenu(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: Text("..."),
+                  );
+                } else if(snapshot.hasData && snapshot.data != null) {
+                  return Row(
                       children: [
-                        categoriesContainer(
-                          image: snapshot.data![0]['menuImg'],
-                          name: "Ayam Geprek",
+                        Expanded(
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height / 6,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width * (15 / 375)),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    return categoriesContainer(
+                                      image: snapshot.data![index]['menuImg'],
+                                      name: "${snapshot.data![index]['menuName']}",
+                                    );
+                                  },),
+                              )
+                            )
                         ),
-                      ],
-                    );
-                  } else {
-                    return const Center(
-                      child: Text("Terjadi Error"),
-                    );
-                  }
-                },
-              ),
+                      ]
+                  );
+                } else {
+                  return const Center(
+                    child: Text("Terjadi Error"),
+                  );
+                }
+              },
             ),
+            // SingleChildScrollView(
+            //   scrollDirection: Axis.horizontal,
+            //   padding: EdgeInsets.symmetric(
+            //       vertical: MediaQuery.of(context).size.width * (15 / 375)),
+            //   child:
+            // ),
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: getProportionateScreenWidth(15),
@@ -178,7 +204,7 @@ class _Body extends State<Body> {
                         itemBuilder: (context, index) {
                           return StandContainer(
                             image: data[index].image,
-                            namaStand: data[index].name,
+                            namaStand: capitalizeAllWord(data[index].name),
                             nmrStand: index.toString(),
                             standId: data[index].id,
                           );

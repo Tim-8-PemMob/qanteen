@@ -40,7 +40,7 @@ class _StandOrder extends State<StandOrder> with TickerProviderStateMixin {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Order"),
-          backgroundColor: Colors.redAccent,
+          backgroundColor: Colors.red[700],
           bottom: TabBar(
             controller: _tabController,
             tabs: const [
@@ -70,11 +70,12 @@ class _StandOrder extends State<StandOrder> with TickerProviderStateMixin {
         ),
         body: TabBarView(
           controller: _tabController,
-          children: <Widget> [
-              StandOrderStreamBuilder(standId: standId, status: "Pending"),
-              StandOrderStreamBuilder(standId: standId, status: "Process"),
-              StandOrderStreamBuilder(standId: standId, status: "Finished"),
-            ],),
+          children: <Widget>[
+            StandOrderStreamBuilder(standId: standId, status: "Pending"),
+            StandOrderStreamBuilder(standId: standId, status: "Process"),
+            StandOrderStreamBuilder(standId: standId, status: "Finished"),
+          ],
+        ),
       ),
     );
   }
