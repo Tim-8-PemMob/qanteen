@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qanteen/pages/index.dart';
+import 'package:qanteen/pages/Admin/index.dart';
 import 'package:qanteen/pages/login.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:qanteen/pages/slider.dart';

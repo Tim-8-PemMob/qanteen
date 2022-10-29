@@ -27,8 +27,6 @@ class _Cart extends State<Cart> {
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");
 
-    // DocumentReference standRef, menuRef;
-    late String standName, menuName;
     var listCart = List<CartModel>.empty(growable: true);
     await FirebaseFirestore.instance
         .collection("Users")
@@ -38,6 +36,7 @@ class _Cart extends State<Cart> {
         .then((data) async {
       for (var doc in data.docs) {
         late String standName, menuName, imageUrl;
+        late int menuPrice;
 
         await FirebaseFirestore.instance
             .collection("Stands")
@@ -61,30 +60,15 @@ class _Cart extends State<Cart> {
           if (menu != null) {
             menuName = menu['name'];
             imageUrl = menu['image'];
+            menuPrice = menu['price'];
           }
         });
-        // standRef = FirebaseFirestore.instance.doc(doc.data()["standId"].path);
-        // menuRef = FirebaseFirestore.instance.doc(doc.data()['menuId'].path);
-        //
-        // await standRef.get().then((DocumentSnapshot documentSnapshot) {
-        //   if (documentSnapshot.exists) {
-        //     // print(documentSnapshot['name']);
-        //     standName = documentSnapshot['name'];
-        //   }
-        // });
-        //
-        // await menuRef.get().then((DocumentSnapshot documentSnapshot) {
-        //   if (documentSnapshot.exists) {
-        //     // print(documentSnapshot['name']);
-        //     menuName = documentSnapshot['name'];
-        //     imageUrl = documentSnapshot['image'];
-        //   }
-        // });
 
         CartModel cartModel = CartModel(
             id: doc.id,
             menuId: doc.data()['menuId'],
             menuName: menuName,
+            menuPrice: menuPrice,
             standId: doc.data()['standId'],
             standName: standName,
             total: doc.data()['total'],
@@ -196,6 +180,7 @@ class _Cart extends State<Cart> {
           "menuName": menuName, // harga per menu atau total harga pesanan
           "menuPrice": menuPrice,
           "total": doc.data()['total'],
+          "timeOrder": orderTime,
           "status": "Pending",
         }).then((res) async {
           await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Orders").add({

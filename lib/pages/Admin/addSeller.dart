@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../index.dart';
+import 'index.dart';
 
 class AddSeller extends StatefulWidget {
   @override

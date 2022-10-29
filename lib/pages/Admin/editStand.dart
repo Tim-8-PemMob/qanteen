@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qanteen/pages/index.dart';
+import 'package:qanteen/pages/Admin/index.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditStand extends StatefulWidget {
@@ -86,26 +86,6 @@ class _EditStand extends State<EditStand> {
     return message;
   }
 
-  Future<String> deleteStandById(String standId) async {
-    late String message;
-    await FirebaseFirestore.instance.collection("Stands").doc(standId).delete().then((res) {
-      deleteStandStorage(standId);
-      message = "Stand Berhasil Di Hapus";
-    }, onError: (e) {
-      message = "Terjadi Kesalahan ${e}";
-    });
-    return message;
-  }
-
-  Future deleteStandStorage(String standId) async {
-    await FirebaseStorage.instance.ref("${standId}").listAll().then((value) {
-      value.items.forEach((element) {
-        print("element : ${element}");
-        FirebaseStorage.instance.ref(element.fullPath).delete();
-      });
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -119,20 +99,6 @@ class _EditStand extends State<EditStand> {
       appBar: AppBar(
         backgroundColor: Colors.redAccent,
         title: const Text("Edit Stands"),
-        actions: [
-          IconButton(
-              onPressed: () {
-                deleteStandById(standId).then((msg) {
-                  var snackBar = SnackBar(content: Text(msg));
-                  if (msg == "Stand Berhasil Di Hapus") {
-                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }
-                });
-              },
-              icon: const Icon(Icons.delete)),
-        ],
       ),
       body: Center(
         child: Row(

@@ -31,7 +31,7 @@ class _StandOrderStreamBuilder extends State<StandOrderStreamBuilder>{
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Orders").where("status", isEqualTo: status).snapshots(),
+      stream: FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Orders").orderBy('timeOrder', descending: false).where("status", isEqualTo: status).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(

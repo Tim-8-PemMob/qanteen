@@ -45,6 +45,19 @@ class _AddMenu extends State<AddMenu> {
     return downloadUrl;
   }
 
+  String capitalizeAllWord(String value) {
+    // TODO: Test untuk huruf pertama atau setelah spasi harus besar dan huruf lainnya harus kecil
+    var result = value[0].toUpperCase();
+    for (int i = 1; i < value.length; i++) {
+      if (value[i - 1] == " ") {
+        result = result + value[i].toUpperCase();
+      } else {
+        result = result + value[i].toLowerCase();
+      }
+    }
+    return result;
+  }
+
   Future<String> inputMenu(String standId, File imgPath) async {
     late String message;
     await FirebaseFirestore.instance
@@ -53,7 +66,7 @@ class _AddMenu extends State<AddMenu> {
         .collection("Menus")
         .add({
       "image": "placeholder",
-      "name": tName.text.toString(),
+      "name": capitalizeAllWord(tName.text.toString()),
       "price": int.parse(tPrice.text),
       "total": int.parse(tTotal.text),
     }).then((res) async {

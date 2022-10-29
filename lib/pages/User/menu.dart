@@ -58,6 +58,7 @@ class _Menu extends State<Menu> {
 
     listStand.forEach((str) {
       var textEditingController = new TextEditingController(text: "1");
+      //str.id = id menu
       textEditingControllers.putIfAbsent(str.id, () => textEditingController);
       return textFields.add(TextField(
         controller: textEditingController,
@@ -94,8 +95,6 @@ class _Menu extends State<Menu> {
       "total": FieldValue.increment(totalBuy * -1),
     });
   }
-  //TODO: sebelum di tambahkan ke cart total beli dengan total menu di db online bukan dengan data yang sudah di ambil
-  //TODO: ganti en validasi e cok
 
   Future<bool> checkTotalMenu(
       String standId, String menuId, int totalBuy) async {

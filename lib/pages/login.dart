@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qanteen/pages/Admin/addSeller.dart';
-import 'package:qanteen/pages/index.dart';
+import 'package:qanteen/pages/Admin/index.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -141,7 +141,7 @@ class _LoginPage extends State<LoginPage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => AddSeller()));
+                                      builder: (context) => Index()));
                             }
                           } else {
                             var snackBar = SnackBar(
