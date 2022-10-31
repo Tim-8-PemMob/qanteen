@@ -247,6 +247,8 @@ class _Cart extends State<Cart> {
     getUserUid();
   }
 
+  int i = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -415,89 +417,109 @@ class _Cart extends State<Cart> {
           }
         },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Container(
-        width: getProportionateScreenWidth(300),
-        child: FloatingActionButton(
-          backgroundColor: Colors.red[700],
-          onPressed: () async {
-            await PlaceOrder().then((msg) {
-              setState(() {
-                var snackBar = SnackBar(
-                    duration: const Duration(seconds: 2), content: Text(msg));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              });
-            });
-          },
-          child: Container(
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: 300,
-            decoration: BoxDecoration(
-              color: Colors.red[700],
-              borderRadius: BorderRadius.all(
-                Radius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.monetization_on,
-                ),
-                Text("Check Out")
-              ],
-            ),
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          height: 130,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Total:",
-                    style: TextStyle(
-                      color: Colors.red[700],
-                      fontSize: 22,
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      // floatingActionButton: Container(
+      //   width: getProportionateScreenWidth(300),
+      //   child: FloatingActionButton(
+      //     backgroundColor: Colors.red[700],
+      //     onPressed: () async {
+      //       await PlaceOrder().then((msg) {
+      //         setState(() {
+      //           var snackBar = SnackBar(
+      //               duration: const Duration(seconds: 2), content: Text(msg));
+      //           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      //         });
+      //       });
+      //     },
+      //     child: Container(
+      //       alignment: Alignment.center,
+      //       width: MediaQuery.of(context).size.width,
+      //       height: 300,
+      //       decoration: BoxDecoration(
+      //         color: Colors.red[700],
+      //         borderRadius: BorderRadius.all(
+      //           Radius.circular(12),
+      //         ),
+      //       ),
+      //       child: Row(
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         children: [
+      //           Icon(
+      //             Icons.monetization_on,
+      //           ),
+      //           Text("Check Out")
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      bottomNavigationBar: FutureBuilder(
+        future: getCartById(),
+        builder: (context, snapshot) {
+          var data = snapshot.data;
+          // int total = 0;
+          // if (data != null)
+          //   data.forEach((item) {
+          //     total += item.menuPrice;
+          //   });
+          // print(total);
+
+          return (data != null && data.isNotEmpty)
+              ? BottomAppBar(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    height: 130,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Total:",
+                              style: TextStyle(
+                                color: Colors.red[700],
+                                fontSize: 22,
+                              ),
+                            ),
+                            Text(
+                              "Rp 20.000",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.red[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            await getCartById();
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 50,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.red[700],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              "Check Out",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    "Rp 20.000",
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red[700],
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                alignment: Alignment.center,
-                height: 50,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.red[700],
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  "Check Out",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+                )
+              : Container();
+        },
       ),
     );
   }
