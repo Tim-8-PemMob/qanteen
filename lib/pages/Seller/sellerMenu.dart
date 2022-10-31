@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/model/menu_model.dart';
 import 'package:qanteen/pages/Seller/addMenu.dart';
+import 'package:qanteen/pages/Seller/sellerHistory.dart';
 import 'package:qanteen/pages/User/cart.dart';
 import 'package:qanteen/pages/Seller/editMenu.dart';
 import 'package:qanteen/pages/Admin/editStand.dart';
@@ -185,6 +186,10 @@ class _SellerMenu extends State<SellerMenu> {
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => StandOrder(standId: standId))),
               icon: Icon(Icons.menu_book)),
+          IconButton(
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => SellerHistory(standId: standId))),
+              icon: Icon(Icons.history)),
         ],
       ),
       body: FutureBuilder(

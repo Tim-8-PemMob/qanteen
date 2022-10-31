@@ -3,18 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
-class History extends StatefulWidget {
+class SellerHistory extends StatefulWidget {
+  final String standId;
+  SellerHistory({required this.standId});
+
   @override
-  _History createState() => _History();
+  _SellerHistory createState() => _SellerHistory(standId: standId);
 }
 
-class _History extends State<History> {
+class _SellerHistory extends State<SellerHistory> {
+  final String standId;
+  _SellerHistory({required this.standId});
 
   Future<QuerySnapshot> getHistory() async {
-    final pref = await SharedPreferences.getInstance();
-    final String userUid = pref.getString("userUid")!;
-
-    return FirebaseFirestore.instance.collection("Users").doc(userUid).collection("History").orderBy('completeAt', descending: true).get();
+    return FirebaseFirestore.instance.collection("Stands").doc(standId).collection("History").orderBy('completeAt', descending: true).get();
   }
 
   String formatTime(Timestamp time) {
@@ -24,9 +26,12 @@ class _History extends State<History> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      minimum: const EdgeInsets.only(top: 50),
-        child: FutureBuilder(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.red[700],
+        title: Text("History"),
+      ),
+      body: FutureBuilder(
           future: getHistory(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -60,7 +65,7 @@ class _History extends State<History> {
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(historyDoc['standName']),
+                                    Text(historyDoc['userName']),
                                     Text("Total : ${historyDoc['menuTotal'].toString()}"),
                                     Text(formatTime(historyDoc['completeAt'])),
                                   ],

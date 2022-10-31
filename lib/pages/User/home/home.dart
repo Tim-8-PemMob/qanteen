@@ -1,7 +1,7 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:qanteen/pages/User/history.dart';
+import 'package:qanteen/pages/User/userHistory.dart';
 import 'package:qanteen/pages/User/profile.dart';
 import 'package:qanteen/pages/User/userOrder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,7 +24,7 @@ class _homeState extends State<home> {
   late List<Widget> widgets = [
     Body(),
     UserOrder(userUid: userUid),
-    History(),
+    UserHistory(),
     const myProfile(),
   ];
 

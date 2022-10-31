@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:qanteen/pages/User/home/components/SizeConfig.dart';
 import 'package:qanteen/pages/User/userOrder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../model/cart_model.dart';
 
 class Cart extends StatefulWidget {
@@ -36,6 +35,7 @@ class _Cart extends State<Cart> {
     });
   }
 
+  List userCartList = [];
   Future<List<CartModel>> getCartById() async {
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");
@@ -89,6 +89,7 @@ class _Cart extends State<Cart> {
         listCart.add(cartModel);
       }
     });
+    userCartList = listCart;
     return listCart;
   }
 
@@ -240,6 +241,17 @@ class _Cart extends State<Cart> {
     return message;
   }
 
+  int countTotalPrice(List<dynamic> listMenu) {
+    if(listMenu.isEmpty) {
+      return 0;
+    }
+    late int totalPrice;
+    for(var menu in listMenu) {
+      totalPrice += int.parse(menu.total * menu.menuPrice);
+    }
+    return totalPrice;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -370,13 +382,14 @@ class _Cart extends State<Cart> {
                                                       });
                                                     });
                                                   },
-                                                  child: Icon(Icons
+                                                  child: const Icon(Icons
                                                       .add_circle_outline)),
-                                              SizedBox(
+                                              const SizedBox(
                                                 width: 15,
                                               ),
                                               InkWell(
                                                 onTap: () {
+                                                  // TODO: ganti parameter terakhir (total reduce) menjadi dinamis ???
                                                   changeTotalCart(
                                                           data[index].standId,
                                                           data[index].menuId,
@@ -384,7 +397,6 @@ class _Cart extends State<Cart> {
                                                           -1)
                                                       .then((msg) {
                                                     setState(() {
-                                                      // TODO: ganti parameter terakhir (total reduce) menjadi dinamis ???
                                                       var snackBar = SnackBar(
                                                           duration:
                                                               const Duration(
@@ -435,7 +447,7 @@ class _Cart extends State<Cart> {
             height: 300,
             decoration: BoxDecoration(
               color: Colors.red[700],
-              borderRadius: BorderRadius.all(
+              borderRadius: const BorderRadius.all(
                 Radius.circular(12),
               ),
             ),
@@ -469,7 +481,7 @@ class _Cart extends State<Cart> {
                     ),
                   ),
                   Text(
-                    "Rp 20.000",
+                    countTotalPrice(userCartList).toString(),
                     style: TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.bold,
