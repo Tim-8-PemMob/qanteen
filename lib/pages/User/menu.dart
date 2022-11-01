@@ -115,26 +115,15 @@ class _Menu extends State<Menu> {
     return result;
   }
 
-  Future<String> addCart(
-      String standId, String menuId, int total, String standName) async {
+  Future<String> addCart(String standId, String menuId, int total, String standName) async {
     // await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get();
     final dbInstance = FirebaseFirestore.instance;
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");
     late String message;
-    await dbInstance
-        .collection("Users")
-        .doc(userUid)
-        .collection("Cart")
-        .where("menuId", isEqualTo: menuId)
-        .get()
-        .then((data) async {
+    await dbInstance.collection("Users").doc(userUid).collection("Cart").where("menuId", isEqualTo: menuId).get().then((data) async {
       if (data.docs.isEmpty) {
-        await FirebaseFirestore.instance
-            .collection("Users")
-            .doc(userUid)
-            .collection("Cart")
-            .add({
+        await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").add({
           "standId": standId,
           "standName": standName,
           "menuId": menuId,
@@ -147,12 +136,7 @@ class _Menu extends State<Menu> {
         });
       } else {
         for (var doc in data.docs) {
-          await FirebaseFirestore.instance
-              .collection("Users")
-              .doc(userUid)
-              .collection("Cart")
-              .doc(doc.id)
-              .update({
+          await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").doc(doc.id).update({
             "total": FieldValue.increment(total),
           }).then((msg) async {
             await reducePortion(standId, menuId, total);

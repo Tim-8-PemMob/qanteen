@@ -28,20 +28,24 @@ class _Body extends State<Body> {
     return listStand;
   }
 
-  Future<List<dynamic>> getRandomMenu() async {
+  Future<List<dynamic>> getRandomMenu(int randomGet) async {
     List listMenuRandom = [];
-    Map mapMenu = new Map();
-    while(listMenuRandom.length <= 8) {
+    while(listMenuRandom.length <= randomGet) {
       var key = FirebaseFirestore.instance.collection("Stands").doc().id;
       await FirebaseFirestore.instance.collection("Stands").where(FieldPath.documentId , isGreaterThanOrEqualTo: key).limit(5).get().then((value) async {
+        print('get greater stand : ${value.docs.length}');
         if(value.docs.length == 0) {
           await FirebaseFirestore.instance.collection("Stands").where(FieldPath.documentId , isLessThanOrEqualTo: key).limit(5).get().then((res) async {
+            print('get lesser stand : ${res.docs.length}');
             for(var data in res.docs) {
+              // random menu hanya tampilkan yang tidak habis
               await FirebaseFirestore.instance.collection("Stands").doc(data.id).collection('Menus').where(FieldPath.documentId, isGreaterThanOrEqualTo: key).limit(1).get().then((value) {
                 for(var menu in value.docs) {
+                  print('first loop : ${menu.id}');
                   Map menuMap = new Map();
                   menuMap['standId'] = data.id;
                   menuMap['menuId'] = menu.id;
+                  menuMap['standName'] = data.data()!['name'];
                   menuMap['menuTotal'] = menu.data()!['total'];
                   menuMap['menuImg'] = menu.data()!['image'];
                   menuMap['menuName'] = menu.data()!['name'];
@@ -55,9 +59,11 @@ class _Body extends State<Body> {
           for(var data in value.docs) {
             await FirebaseFirestore.instance.collection("Stands").doc(data.id).collection('Menus').where(FieldPath.documentId, isGreaterThanOrEqualTo: key).limit(1).get().then((value) {
               for(var menu in value.docs) {
+                print('second loop : ${menu.id}');
                 Map menuMap = new Map();
                 menuMap['standId'] = data.id;
                 menuMap['menuId'] = menu.id;
+                menuMap['standName'] = data.data()!['name'];
                 menuMap['menuTotal'] = menu.data()!['total'];
                 menuMap['menuImg'] = menu.data()!['image'];
                 menuMap['menuName'] = menu.data()!['name'];
@@ -69,12 +75,14 @@ class _Body extends State<Body> {
         }
       });
     }
+    // for (var data in listMenuRandom) {
+    //   print(data['menuId']);
+    // }
     return listMenuRandom;
   }
 
   @override
   void initState() {
-    getRandomMenu();
     super.initState();
   }
   String capitalizeAllWord(String value) {
@@ -120,7 +128,7 @@ class _Body extends State<Body> {
               ),
             ),
             FutureBuilder(
-              future: getRandomMenu(),
+              future: getRandomMenu(8),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
@@ -142,6 +150,9 @@ class _Body extends State<Body> {
                                     return categoriesContainer(
                                       image: snapshot.data![index]['menuImg'],
                                       name: "${snapshot.data![index]['menuName']}",
+                                      standId: snapshot.data![index]['standId'],
+                                      menuId: snapshot.data![index]['menuId'],
+                                      standName: snapshot.data![index]['standName'],
                                     );
                                   },),
                               )

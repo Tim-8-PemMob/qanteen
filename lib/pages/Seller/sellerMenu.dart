@@ -59,6 +59,8 @@ class _SellerMenu extends State<SellerMenu> {
   }
 
   String standName = "Please Wait...";
+  bool standExist = true;
+
   Future getStandById(String standId) async {
     await FirebaseFirestore.instance
         .collection('Stands')
@@ -66,9 +68,16 @@ class _SellerMenu extends State<SellerMenu> {
         .get()
         .then((data) {
       var stand = data.data();
+      print(data.data());
       if (stand != null) {
+        standExist = true;
         setState(() {
           standName = stand['name'].toString();
+        });
+      } else {
+        standExist = false;
+        setState(() {
+          standName = "Deleted";
         });
       }
     });
@@ -182,17 +191,19 @@ class _SellerMenu extends State<SellerMenu> {
         title: Text("Menu, ${standName}"),
         backgroundColor: Colors.red[700],
         actions: [
-          IconButton(
+          (standExist)? IconButton(
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => StandOrder(standId: standId))),
-              icon: Icon(Icons.menu_book)),
-          IconButton(
+              icon: Icon(Icons.menu_book))
+          : const Center(),
+          (standExist) ? IconButton(
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => SellerHistory(standId: standId))),
-              icon: Icon(Icons.history)),
+              icon: Icon(Icons.history))
+              : const Center(),
         ],
       ),
-      body: FutureBuilder(
+      body: (standExist)? FutureBuilder(
         future: getMenuFireStore(standId),
         builder: (context, snapshot) {
           var data = snapshot.data;
@@ -311,8 +322,10 @@ class _SellerMenu extends State<SellerMenu> {
             );
           }
         },
+      ) : const Center(
+        child: Text("Stand Anda Telah Di Hapus Silahkan Hubungi Admin"),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: (standExist)? FloatingActionButton(
         backgroundColor: Colors.red[700],
         onPressed: () {
           Navigator.push(
@@ -326,7 +339,7 @@ class _SellerMenu extends State<SellerMenu> {
               }));
         },
         child: Icon(Icons.restaurant_menu),
-      ),
+      ) : null,
     );
   }
 }
