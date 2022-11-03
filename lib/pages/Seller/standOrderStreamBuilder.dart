@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qanteen/service/notificationService.dart';
 
 class StandOrderStreamBuilder extends StatefulWidget {
   final String standId;
@@ -27,7 +28,19 @@ class _StandOrderStreamBuilder extends State<StandOrderStreamBuilder>{
       "status": status,
     });
   }
+
+  Future<String> getUserFcmToken(String userUid) async {
+    late String userFcmToken;
+    await FirebaseFirestore.instance.collection('Users').doc(userUid).get().then((data) {
+      userFcmToken = data.data()!['fcmToken'];
+    });
+    return userFcmToken;
+  }
   
+  void sendCompleteNotification(String standName, String userUid) async {
+    NotificationService().sendNotification(title: "Your Order is Complete", message: "Your Order in Stand $standName", token: await getUserFcmToken(userUid)); //kirim notif ke pemilih stand / seller
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -80,8 +93,8 @@ class _StandOrderStreamBuilder extends State<StandOrderStreamBuilder>{
                                       : (data['status'] == "Process")
                                       ? IconButton(
                                     onPressed: () {
-                                      changeStatus(
-                                          data.id, "Finished");
+                                      changeStatus(data.id, "Finished");
+                                      sendCompleteNotification(data['standName'], data['userUid']);
                                     },
                                     icon: const Icon(Icons.attach_money),
                                   )

@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qanteen/pages/Admin/addSeller.dart';
 import 'package:qanteen/pages/login.dart';
 
-Future<void> signUp(
-    String name, String email, String password, String confirmPassword) async {
+Future<void> signUp(String name, String email, String password, String confirmPassword) async {
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+
   try {
     if (password == confirmPassword) {
       UserCredential user = await FirebaseAuth.instance
@@ -19,6 +21,7 @@ Future<void> signUp(
           .set({
         "name": name,
         "role" : "user",
+        'fcmToken' : fcmToken,
       });
     }
   } catch (e) {

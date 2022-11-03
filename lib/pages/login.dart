@@ -1,13 +1,11 @@
 import 'dart:convert';
-import 'dart:math';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:qanteen/pages/Seller/sellerMenu.dart';
-import 'package:qanteen/pages/Seller/addMenu.dart';
 import 'package:qanteen/pages/User/home/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qanteen/pages/Admin/addSeller.dart';
 import 'package:qanteen/pages/Admin/index.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,6 +36,7 @@ class _LoginPage extends State<LoginPage> {
       var logedUser = user.user;
       if (logedUser != null) {
         userUid = user.user!.uid;
+        await addFcmToken(data['role'], data['standId'], userUid);
         await prefs.setString("userUid", logedUser.uid);
       };
       if (data['role'] == 'seller') standId = data['standId'];
@@ -45,6 +44,31 @@ class _LoginPage extends State<LoginPage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<void> addFcmToken(String role, String? standId, String userUid) async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    print('fcm token = $fcmToken');
+
+    await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
+      'fcmToken' : fcmToken,
+    });
+
+    if(role == 'seller') {
+      await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
+        'ownerFcmToken' : fcmToken,
+      });
+    }
+
+    FirebaseMessaging.instance.onTokenRefresh
+        .listen((fcmToken) {
+      // TODO: If necessary send token to application server.
+
+      // Note: This callback is fired at each app startup and whenever a new
+      // token is generated.
+    }).onError((err) {
+      // Error getting token.
+    });
   }
 
   @override

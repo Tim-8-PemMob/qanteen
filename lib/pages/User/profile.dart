@@ -38,6 +38,25 @@ class _myProfileState extends State<myProfile> {
     return mapData;
   }
 
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
+  Future<void> deleteFcmToken(String? standId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? userUid = prefs.getString("userUid");
+
+    if (standId == null) {
+      await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
+        'ownerFcmToken' : "",
+      });
+    }
+
+    await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
+      'fcmToken' : "",
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -194,6 +213,14 @@ class _myProfileState extends State<myProfile> {
                 );
               },
             )),
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            signOut().then((res) {
+              deleteFcmToken(null);
+            });
+          },
+        child: const Icon(Icons.logout),
       ),
     );
   }

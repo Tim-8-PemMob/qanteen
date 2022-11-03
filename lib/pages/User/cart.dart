@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/pages/User/userOrder.dart';
+import 'package:qanteen/service/notificationService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../model/cart_model.dart';
 
@@ -121,24 +123,34 @@ class _Cart extends State<Cart> {
     return message;
   }
 
+  Future<String> getStandFcmToken(String standId) async {
+    late String standFcmToken;
+    await FirebaseFirestore.instance.collection('Stands').doc(standId).get().then((data) {
+      standFcmToken = data.data()!['ownerFcmToken'];
+    });
+    return standFcmToken;
+  }
+
   Future<String> placeOrder() async {
     Timestamp orderTime = Timestamp.fromDate(DateTime.now());
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");
     late String message;
 
-    late String userName, menuName;
+    late String userName, menuName, fcmToken;
     late int menuPrice;
     await FirebaseFirestore.instance.collection("Users").doc(userUid).get().then((data) {
       var user = data.data();
       if (user != null) {
         userName = user['name'];
+        fcmToken = user['fcmToken'];
       }
     });
 
     await FirebaseFirestore.instance.collection("Users").doc(userUid).collection("Cart").get().then((res) async {
       for (var doc in res.docs) {
-        await FirebaseFirestore.instance.collection("Stands").doc(doc.data()['standId']).collection("Menus").doc(doc.data()['menuId']).get().then((data) {
+        await FirebaseFirestore.instance.collection("Stands").doc(doc.data()['standId']).collection("Menus").doc(doc.data()['menuId']).get().then((data) async {
+          NotificationService().sendNotification(title: "New Order Here", message: "Order From $userName", token: await getStandFcmToken(doc.data()['standId'])); //kirim notif ke pemilih stand / seller
           var menu = data.data();
           if (menu != null) {
             menuName = menu['name'];

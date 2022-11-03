@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/model/menu_model.dart';
 import 'package:qanteen/pages/Seller/addMenu.dart';
 import 'package:qanteen/pages/Seller/sellerHistory.dart';
-import 'package:qanteen/pages/User/cart.dart';
 import 'package:qanteen/pages/Seller/editMenu.dart';
-import 'package:qanteen/pages/Admin/editStand.dart';
 import 'package:qanteen/pages/Seller/standOrder.dart';
+import 'package:qanteen/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SellerMenu extends StatefulWidget {
@@ -178,9 +178,25 @@ class _SellerMenu extends State<SellerMenu> {
     return message;
   }
 
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
+  Future<void> deleteFcmToken(String standId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? userUid = prefs.getString("userUid");
+
+    await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
+      'ownerFcmToken' : "",
+    });
+
+    await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
+      'fcmToken' : "",
+    });
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getStandById(standId);
   }
@@ -188,6 +204,15 @@ class _SellerMenu extends State<SellerMenu> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              deleteFcmToken(standId).then((value) {
+                signOut();
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
+              });
+            },
+            icon: const Icon(Icons.logout),
+        ),
         title: Text("Menu, ${standName}"),
         backgroundColor: Colors.red[700],
         actions: [
