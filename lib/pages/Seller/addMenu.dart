@@ -88,70 +88,198 @@ class _AddMenu extends State<AddMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("Input Menu"),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red[700],
       ),
-      body: Center(
-        child: Row(
-          children: [
-            Expanded(
-                child: Column(
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.4),
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Center(
+            child: Row(
               children: [
-                IconButton(
-                    onPressed: () => getImagePath(),
-                    icon: const Icon(Icons.image)),
-                (image != null)
-                    ? Image(
-                        height: MediaQuery.of(context).size.height / 5,
-                        width: MediaQuery.of(context).size.height,
-                        image: FileImage(image!))
-                    : const Text("Image is Empty"),
-                TextField(
-                  controller: tName,
-                  decoration: const InputDecoration(
-                    hintText: "Nama Menu Anda",
-                    labelText: "Nama Menu",
-                  ),
-                ),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  controller: tPrice,
-                  decoration: const InputDecoration(
-                      hintText: "Harga Menu Anda", labelText: "Harga Menu"),
-                ),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  controller: tTotal,
-                  decoration: const InputDecoration(
-                      hintText: "Total Prosi Yang Anda Jual",
-                      labelText: "Total Menu"),
-                ),
-                TextButton(
-                    onPressed: () async {
-                      if (tName.text.isNotEmpty &&
-                          tPrice.text.isNotEmpty &&
-                          tTotal.text.isNotEmpty &&
-                          image != null) {
-                        inputMenu(standId, image!).then((msg) {
-                          var snackBar = SnackBar(content: Text(msg));
-                          if (msg == "Menu Berhasil di Tambahkan") {
-                            Navigator.pop(context, msg);
+                Expanded(
+                  child: Column(
+                    children: [
+                      IconButton(
+                          onPressed: () => getImagePath(),
+                          icon: const Icon(Icons.image)),
+                      (image != null)
+                          ? Container(
+                              margin: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).size.height / 20,
+                              ),
+                              child: Image(
+                                  height:
+                                      MediaQuery.of(context).size.height / 5,
+                                  width: MediaQuery.of(context).size.height,
+                                  image: FileImage(image!)),
+                            )
+                          : const Text("Image is Empty"),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8, top: 50),
+                        child: TextField(
+                          controller: tName,
+                          decoration: const InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              borderSide: BorderSide(
+                                color: Colors.transparent,
+                              ),
+                            ),
+                            border: InputBorder.none,
+                            enabled: true,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              borderSide: BorderSide(
+                                color: Colors.transparent,
+                              ),
+                            ),
+                            fillColor: Colors.black12,
+                            filled: true,
+                            hintStyle: TextStyle(color: Colors.black),
+                            floatingLabelStyle: TextStyle(color: Colors.black),
+                            prefixIcon: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Icon(Icons.food_bank_outlined,
+                                  color: Colors.black),
+                            ),
+                            hintText: "Nama Menu Anda",
+                            labelText: "Nama Menu",
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          controller: tPrice,
+                          decoration: const InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.transparent,
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                            border: InputBorder.none,
+                            enabled: true,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.transparent,
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                            fillColor: Colors.black12,
+                            filled: true,
+                            hintStyle: TextStyle(color: Colors.black),
+                            floatingLabelStyle: TextStyle(color: Colors.black),
+                            prefixIcon: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Icon(Icons.price_change_outlined,
+                                  color: Colors.black),
+                            ),
+                            hintText: "Harga Menu Anda",
+                            labelText: "Harga Menu",
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, bottom: 50),
+                        child: TextField(
+                          style: TextStyle(color: Colors.black),
+                          keyboardType: TextInputType.number,
+                          controller: tTotal,
+                          decoration: const InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              borderSide: BorderSide(
+                                color: Colors.transparent,
+                              ),
+                            ),
+                            border: InputBorder.none,
+                            enabled: true,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              borderSide: BorderSide(
+                                color: Colors.transparent,
+                              ),
+                            ),
+                            fillColor: Colors.black12,
+                            filled: true,
+                            hintStyle: TextStyle(color: Colors.black),
+                            floatingLabelStyle: TextStyle(color: Colors.black),
+                            prefixIcon: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Icon(Icons.functions_outlined,
+                                  color: Colors.black),
+                            ),
+                            hintText: "Total Prosi Yang Anda Jual",
+                            labelText: "Total Menu",
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          if (tName.text.isNotEmpty &&
+                              tPrice.text.isNotEmpty &&
+                              tTotal.text.isNotEmpty &&
+                              image != null) {
+                            inputMenu(standId, image!).then((msg) {
+                              var snackBar = SnackBar(content: Text(msg));
+                              if (msg == "Menu Berhasil di Tambahkan") {
+                                Navigator.pop(context, msg);
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              }
+                            });
                           } else {
+                            var snackBar = SnackBar(
+                                content:
+                                    Text("Tolong Masukkan Data Dengan Benar"));
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(snackBar);
                           }
-                        });
-                      } else {
-                        var snackBar = SnackBar(
-                            content: Text("Tolong Masukkan Data Dengan Benar"));
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                    },
-                    child: const Text("Input Menu"))
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width / 4,
+                            height: MediaQuery.of(context).size.height / 18,
+                            color: Colors.red[700],
+                            child: Center(
+                              child: const Text(
+                                "Input Menu",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
-            ))
-          ],
+            ),
+          ),
         ),
       ),
     );

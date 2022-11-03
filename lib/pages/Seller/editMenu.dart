@@ -139,62 +139,213 @@ class _EditMenu extends State<EditMenu> {
     // TODO: implement build
     var img = image;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text("Edit Menu"),
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red[700],
       ),
-      body: Center(
-        child: Row(
-          children: [
-            Expanded(
-                child: Column(
+      body: SingleChildScrollView(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.4),
+        scrollDirection: Axis.vertical,
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Center(
+            child: Row(
               children: [
-                IconButton(
-                    onPressed: () => getImagePath(),
-                    icon: const Icon(Icons.image)),
-                (oldImage == "" && img != null)
-                    ? Image(
-                        height: MediaQuery.of(context).size.height / 5,
-                        width: MediaQuery.of(context).size.height,
-                        image: FileImage(img))
-                    : (oldImage == "" && img == null)
-                        ? CircularProgressIndicator()
-                        : Image(
-                            height: MediaQuery.of(context).size.height / 5,
-                            width: MediaQuery.of(context).size.height,
-                            image: NetworkImage(oldImage)),
-                TextField(
-                  controller: tName,
-                  decoration: const InputDecoration(
-                      hintText: "Nama Baru Menu", labelText: "Nama Menu"),
-                ),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  controller: tPrice,
-                  decoration: const InputDecoration(
-                      hintText: "Harga Baru Menu", labelText: "Harga Menu"),
-                ),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  controller: tTotal,
-                  decoration: const InputDecoration(
-                      hintText: "Total Prosi Menu", labelText: "Total Menu"),
-                ),
-                TextButton(
-                    onPressed: () {
-                      editMenu(img, standId, oldImage, menuId).then((msg) {
-                        var snackBar = SnackBar(content: Text(msg));
-                        if (msg == "Menu Berhasil di Edit") {
-                          Navigator.pop(context, msg);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        }
-                      });
-                    },
-                    child: const Text("Edit Menu"))
+                Expanded(
+                    child: Column(
+                  children: [
+                    IconButton(
+                        onPressed: () => getImagePath(),
+                        icon: const Icon(Icons.image)),
+                    (oldImage == "" && img != null)
+                        ? Container(
+                            margin: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).size.height / 20,
+                            ),
+                            child: Image(
+                                height: MediaQuery.of(context).size.height / 5,
+                                width: MediaQuery.of(context).size.height,
+                                image: FileImage(img)),
+                          )
+                        : (oldImage == "" && img == null)
+                            ? CircularProgressIndicator()
+                            : Container(
+                                margin: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context).size.height /
+                                        20),
+                                child: Image(
+                                  height:
+                                      MediaQuery.of(context).size.height / 5,
+                                  width: MediaQuery.of(context).size.height,
+                                  image: NetworkImage(oldImage),
+                                ),
+                              ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: TextField(
+                        controller: tName,
+                        decoration: const InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                          ),
+                          border: InputBorder.none,
+                          enabled: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                          ),
+                          fillColor: Colors.black12,
+                          filled: true,
+                          hintStyle: TextStyle(color: Colors.black),
+                          floatingLabelStyle: TextStyle(color: Colors.black),
+                          prefixIcon: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            child: Icon(Icons.price_change_outlined,
+                                color: Colors.black),
+                          ),
+                          hintText: "Nama Baru Menu",
+                          labelText: "Nama Menu",
+                        ),
+                      ),
+                    ),
+                    // TextField(
+                    //   controller: tName,
+                    //   decoration: const InputDecoration(
+                    //       hintText: "Nama Baru Menu", labelText: "Nama Menu"),
+                    // ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        controller: tPrice,
+                        decoration: const InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                          ),
+                          border: InputBorder.none,
+                          enabled: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                          ),
+                          fillColor: Colors.black12,
+                          filled: true,
+                          hintStyle: TextStyle(color: Colors.black),
+                          floatingLabelStyle: TextStyle(color: Colors.black),
+                          prefixIcon: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            child: Icon(Icons.price_change_outlined,
+                                color: Colors.black),
+                          ),
+                          hintText: "Harga Baru Menu",
+                          labelText: "Harga Menu",
+                        ),
+                      ),
+                    ),
+                    // TextField(
+                    //   keyboardType: TextInputType.number,
+                    //   controller: tPrice,
+                    //   decoration: const InputDecoration(
+                    //       hintText: "Harga Baru Menu", labelText: "Harga Menu"),
+                    // ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 50),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        controller: tTotal,
+                        decoration: const InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                          ),
+                          border: InputBorder.none,
+                          enabled: true,
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                          ),
+                          fillColor: Colors.black12,
+                          filled: true,
+                          hintStyle: TextStyle(color: Colors.black),
+                          floatingLabelStyle: TextStyle(color: Colors.black),
+                          prefixIcon: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            child: Icon(Icons.price_change_outlined,
+                                color: Colors.black),
+                          ),
+                          hintText: "Total Porsi Menu",
+                          labelText: "Total Menu",
+                        ),
+                      ),
+                    ),
+                    // TextField(
+                    //   keyboardType: TextInputType.number,
+                    //   controller: tTotal,
+                    //   decoration: const InputDecoration(
+                    //       hintText: "Total Porsi Menu", labelText: "Total Menu"),
+                    // ),
+                    TextButton(
+                      onPressed: () {
+                        editMenu(img, standId, oldImage, menuId).then((msg) {
+                          var snackBar = SnackBar(content: Text(msg));
+                          if (msg == "Menu Berhasil di Edit") {
+                            Navigator.pop(context, msg);
+                          } else {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          }
+                        });
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width / 4,
+                          height: MediaQuery.of(context).size.height / 18,
+                          color: Colors.red[700],
+                          child: Center(
+                            child: const Text(
+                              "Input Menu",
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ))
               ],
-            ))
-          ],
+            ),
+          ),
         ),
       ),
     );
