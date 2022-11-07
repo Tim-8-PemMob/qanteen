@@ -124,7 +124,6 @@ class _DetailOrder extends State<DetailOrder> {
         }
       });
       if (complete == orderTotal) {
-        print("Delete All");
         await FirebaseFirestore.instance
             .collection("Users")
             .doc(userUid)

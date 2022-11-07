@@ -39,9 +39,7 @@ class _UserOrder extends State<UserOrder> {
           uniqueTime.add(doc.data()['timeOrder']);
         } else {}
       }
-      print(uniqueTime);
     });
-    // print(map);
     return uniqueTime;
     // return map;
   }
@@ -54,7 +52,6 @@ class _UserOrder extends State<UserOrder> {
         .where('timeOrder', isEqualTo: timeOrder)
         .get();
     List<DocumentSnapshot> orderSnapshot = querySnap.docs;
-    print(orderSnapshot.length);
     return orderSnapshot.length;
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
+import 'package:qanteen/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qanteen/pages/User/home/components/SizeConfig.dart';
 
@@ -46,7 +47,7 @@ class _myProfileState extends State<myProfile> {
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");
 
-    if (standId == null) {
+    if (standId != null) {
       await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
         'ownerFcmToken' : "",
       });
@@ -216,8 +217,9 @@ class _myProfileState extends State<myProfile> {
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-            signOut().then((res) {
-              deleteFcmToken(null);
+            deleteFcmToken(null).then((value) {
+              signOut();
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
             });
           },
         child: const Icon(Icons.logout),

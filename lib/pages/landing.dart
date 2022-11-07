@@ -1,5 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/pages/Admin/index.dart';
+import 'package:qanteen/pages/Seller/sellerMenu.dart';
+import 'package:qanteen/pages/User/home/home.dart';
+import 'package:qanteen/pages/homepage.dart';
 import 'package:qanteen/pages/login.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:qanteen/pages/slider.dart';
@@ -31,6 +36,25 @@ class _LandingState extends State<Landing> {
   _onchanged(int index) {
     setState(() {
       _currentPage = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        await FirebaseFirestore.instance.collection("Users").doc(user.uid).get().then((data) {
+          if(data.data()!['role'] == 'seller') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SellerMenu(standId: data.data()!['standId'])));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => home(userUid: user.uid)));
+          }
+        });
+        print('User is signed in!');
+      }
     });
   }
 

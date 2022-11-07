@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qanteen/pages/Admin/addSeller.dart';
 import 'package:qanteen/pages/login.dart';
 
 Future<void> signUp(String name, String email, String password, String confirmPassword) async {

@@ -44,8 +44,6 @@ class _Menu extends State<Menu> {
         .get()
         .then((data) {
       for (var doc in data.docs) {
-        print("name : ${doc.data()['name']}");
-        print("price : ${doc.data()['price']}");
         MenuModel menuModel = MenuModel(
             id: doc.id.toString(),
             name: doc.data()["name"],

@@ -178,7 +178,7 @@ class _SearchResult extends State<SearchResult> {
                     ),
                     child: InkWell(
                         child: SizedBox(
-                            height: 110,
+                            height: MediaQuery.of(context).size.height / 7,
                             child: Center(
                               child: ListTile(
                                 dense: true,

@@ -43,7 +43,7 @@ class _SellerHistory extends State<SellerHistory> {
                     const BorderRadius.all(Radius.circular(12)),
                   ),
                   child: SizedBox(
-                      height: 80,
+                      height: MediaQuery.of(context).size.height / 9,
                       child: Center(
                           child: ListTile(
                             leading: const Icon(Icons.food_bank),
