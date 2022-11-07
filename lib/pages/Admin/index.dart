@@ -9,7 +9,10 @@ Future<List<StandModel>> getStandFireStore() async {
   var listStand = List<StandModel>.empty(growable: true);
   await FirebaseFirestore.instance.collection("Stands").get().then((data) {
     for (var doc in data.docs) {
-      StandModel standModel = StandModel(id: doc.id.toString(), name: doc.data()["name"], image: doc.data()['image']);
+      StandModel standModel = StandModel(
+          id: doc.id.toString(),
+          name: doc.data()["name"],
+          image: doc.data()['image']);
       listStand.add(standModel);
     }
   });
@@ -18,7 +21,11 @@ Future<List<StandModel>> getStandFireStore() async {
 
 Future<String> deleteStandById(String standId) async {
   late String message;
-  await FirebaseFirestore.instance.collection("Stands").doc(standId).delete().then((res) {
+  await FirebaseFirestore.instance
+      .collection("Stands")
+      .doc(standId)
+      .delete()
+      .then((res) {
     deleteStandStorage(standId);
     message = "Stand Berhasil Di Hapus";
   }, onError: (e) {
@@ -42,20 +49,21 @@ class Index extends StatefulWidget {
 }
 
 class _Index extends State<Index> {
-
   @override
   Widget build(BuildContext context) {
     getStandFireStore();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red[700],
         title: const Text("Stand Makanan"),
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (builder) => AddSeller()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (builder) => AddSeller()));
             },
-            icon: Icon(Icons.add),),
+            icon: Icon(Icons.add),
+          ),
         ],
       ),
       body: FutureBuilder(
@@ -71,37 +79,49 @@ class _Index extends State<Index> {
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   return Card(
-                    elevation: 3,
+                      elevation: 3,
                       shape: RoundedRectangleBorder(
                         side: BorderSide(
                           color: Theme.of(context).colorScheme.outline,
                         ),
-                        borderRadius: const BorderRadius.all(Radius.circular(12)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(12)),
                       ),
                       child: InkWell(
-                          child: SizedBox (
+                          child: SizedBox(
                               height: 80,
-                              child: Center (
-                                  child : ListTile(
-                                    leading: const Icon(Icons.food_bank),
-                                    title: Text("${data[index].name.toString()}"),
-                                    trailing: PopupMenuButton<int>(
-                                        onSelected: (value) async {
-                                          if (value == 1) {
-                                            Navigator.push(context, MaterialPageRoute(builder: (builder) => EditStand(standId: data[index].id))).then((msg) => setState(() {
-                                              var snackBar = SnackBar(content: Text(msg));
-                                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              child: Center(
+                                  child: ListTile(
+                                leading: const Icon(Icons.food_bank),
+                                title: Text("${data[index].name.toString()}"),
+                                trailing: PopupMenuButton<int>(
+                                    onSelected: (value) async {
+                                      if (value == 1) {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (builder) => EditStand(
+                                                    standId: data[index]
+                                                        .id))).then((msg) =>
+                                            setState(() {
+                                              var snackBar =
+                                                  SnackBar(content: Text(msg));
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(snackBar);
                                             }));
-                                          } else if (value == 2) {
-                                            deleteStandById(data[index].id).then((msg) {
-                                              setState(() {
-                                                var snackBar = SnackBar(content: Text(msg));
-                                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                              });
-                                            });
-                                          }
-                                        },
-                                        itemBuilder: (BuildContext context) =>
+                                      } else if (value == 2) {
+                                        deleteStandById(data[index].id)
+                                            .then((msg) {
+                                          setState(() {
+                                            var snackBar =
+                                                SnackBar(content: Text(msg));
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(snackBar);
+                                          });
+                                        });
+                                      }
+                                    },
+                                    itemBuilder: (BuildContext context) =>
                                         <PopupMenuEntry<int>>[
                                           const PopupMenuItem<int>(
                                               value: 1,
@@ -110,21 +130,12 @@ class _Index extends State<Index> {
                                               value: 2,
                                               child: const Text("Delete")),
                                         ]),
-                                  )
-                              )
-                          )
-                      )
-                  );
-            }
-            );
-          } else if (snapshot.connectionState == ConnectionState.waiting){
-            return const Center(
-                child: CircularProgressIndicator()
-            );
+                              )))));
+                });
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
           } else {
-            return const Center(
-                child: Text("Stands Makanan Kosong")
-            );
+            return const Center(child: Text("Stands Makanan Kosong"));
           }
         },
       ),
