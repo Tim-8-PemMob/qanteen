@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pf;
@@ -26,6 +28,27 @@ class _Nota extends State<Nota> {
   _Nota({required this.timeOrder});
 
   int hargaAkhir = 0;
+  String? emailUser;
+
+  Future<void> getUserData() async {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      emailUser = user?.email;
+    });
+  }
+
+  String formatTime(Timestamp time) {
+    var dateTime = DateTime.parse(time.toDate().toString());
+    return DateFormat.yMMMEd().format(dateTime).toString();
+  }
+
+  var listCart = List<NotaModel>.empty(growable: true);
+  int countTotalPrice(List<NotaModel> cart) {
+    var totalPrice = 0;
+    for (var menu in cart) {
+      totalPrice += menu.totalHarga;
+    }
+    return totalPrice;
+  }
 
   Future<List<NotaModel>> getDetailOrder(Timestamp timeOrder) async {
     var listData = List<NotaModel>.empty(growable: true);
@@ -50,11 +73,14 @@ class _Nota extends State<Nota> {
               menu: refData.data()!['menuName'],
               hargaMenu: refData.data()!['menuPrice'],
               totalBeli: refData.data()!['total'],
-              totalHarga:
-                  refData.data()!['menuPrice'] * refData.data()!['total']);
+              totalHarga: refData.data()!['menuPrice'] * refData.data()!['total'],
+          );
           listData.add(notaModel);
         });
       }
+    });
+    setState(() {
+      listCart = listData;
     });
     return listData;
   }
@@ -98,15 +124,13 @@ class _Nota extends State<Nota> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    var sum = 0;
-    void jumlahSemua(int totalHarga, int totalBeli) {
-      for (int i = 0; i < totalHarga; i++) {
-        sum += totalHarga * totalBeli;
-      }
-      ;
-    }
+  void initState() {
+    super.initState();
+    getUserData();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text("Nota"),
@@ -180,8 +204,8 @@ class _Nota extends State<Nota> {
                                                         .textTheme
                                                         .caption,
                                                   ),
-                                                  SizedBox(height: 4),
-                                                  Text("Jono@gmail.com"),
+                                                  const SizedBox(height: 4),
+                                                  Text(emailUser ?? ""),
                                                 ],
                                               ),
                                             ),
@@ -205,7 +229,7 @@ class _Nota extends State<Nota> {
                                                           .caption,
                                                     ),
                                                     SizedBox(height: 4),
-                                                    Text("23 oktober 2022"),
+                                                    Text(formatTime(timeOrder)),
                                                   ],
                                                 ),
                                               ),
@@ -225,24 +249,6 @@ class _Nota extends State<Nota> {
                                               shrinkWrap: true,
                                               itemCount: snapshot.data!.length,
                                               itemBuilder: (context, index) {
-                                                // jumlahSemua(
-                                                //     snapshot
-                                                //         .data![index].totalBeli,
-                                                //     snapshot.data![index]
-                                                //         .totalHarga);
-
-                                                for (int i = 0;
-                                                    i <
-                                                        snapshot.data![index]
-                                                            .totalBeli;
-                                                    i++) {
-                                                  sum += snapshot.data![index]
-                                                          .totalBeli *
-                                                      snapshot.data![index]
-                                                          .totalHarga;
-                                                }
-                                                ;
-
                                                 return Container(
                                                   margin: EdgeInsets.only(
                                                       bottom: 20),
@@ -298,7 +304,7 @@ class _Nota extends State<Nota> {
                                                   child: Text(""),
                                                 ),
                                                 Expanded(
-                                                  child: Text("Rp. ${sum}"),
+                                                  child: Text("Rp. ${countTotalPrice(listCart)}"),
                                                 )
                                               ],
                                             )

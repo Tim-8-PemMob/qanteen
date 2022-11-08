@@ -217,10 +217,28 @@ class _myProfileState extends State<myProfile> {
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-            deleteFcmToken(null).then((value) {
-              signOut();
-              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
-            });
+            showDialog<String>(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('Logout'),
+                content: const Text('Logout ?'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      deleteFcmToken(null).then((value) {
+                        signOut();
+                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
+                      });
+                    },
+                    child: const Text('Logout'),
+                  ),
+                ],
+              ),
+            );
           },
         child: const Icon(Icons.logout),
       ),

@@ -206,10 +206,28 @@ class _SellerMenu extends State<SellerMenu> {
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              deleteFcmToken(standId).then((value) {
-                signOut();
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
-              });
+              showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Logout'),
+                  content: const Text('Logout ?'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        deleteFcmToken(standId).then((value) {
+                          signOut();
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
+                        });
+                      },
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
+              );
             },
             icon: const Icon(Icons.logout),
         ),

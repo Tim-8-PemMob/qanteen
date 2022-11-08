@@ -207,16 +207,6 @@ class _Cart extends State<Cart> {
       appBar: AppBar(
         title: const Text("Cart"),
         backgroundColor: Colors.red[700],
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => UserOrder(userUid: userUid)));
-              },
-              icon: const Icon(Icons.query_builder))
-        ],
       ),
       body: FutureBuilder(
         future: getCartById(),
