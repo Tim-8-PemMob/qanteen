@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:paginate_firestore/paginate_firestore.dart';
 
 class SellerHistory extends StatefulWidget {
@@ -18,7 +18,13 @@ class _SellerHistory extends State<SellerHistory> {
 
   String formatTime(Timestamp time) {
     var dateTime = DateTime.parse(time.toDate().toString());
-    return DateFormat.yMMMMEEEEd().format(dateTime).toString();
+    return DateFormat.yMMMMEEEEd('id').format(dateTime).toString();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting();
   }
 
   @override

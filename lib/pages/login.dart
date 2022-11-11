@@ -55,9 +55,12 @@ class _LoginPage extends State<LoginPage> {
     });
 
     if(role == 'seller') {
-      await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
-        'ownerFcmToken' : fcmToken,
-      });
+      var standData = await FirebaseFirestore.instance.collection("Stands").doc(standId);
+      if (standData != null) {
+        standData.update({
+          'ownerFcmToken' : fcmToken,
+        });
+      }
     }
 
     FirebaseMessaging.instance.onTokenRefresh
@@ -151,24 +154,14 @@ class _LoginPage extends State<LoginPage> {
                         signIn(tEmail.text, tPassword.text).then((res) {
                           if (res != null) {
                             if (res['role'] == "user") {
-                              // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => home(userUid: userUid,)));
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => home(userUid: userUid)), (Route<dynamic> route) => false);
                             } else if (res['role'] == 'seller') {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SellerMenu(standId: standId)));
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SellerMenu(standId: standId)), (Route<dynamic> route) => false);
                             } else if(res['role'] == 'admin') {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Index()));
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
                             }
                           } else {
-                            var snackBar = SnackBar(
+                            var snackBar = const SnackBar(
                                 content: Text(
                                     "Mohon Periksa Lagi User dan Email Anda"));
                             ScaffoldMessenger.of(context)
@@ -181,7 +174,7 @@ class _LoginPage extends State<LoginPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Login",
                         style: TextStyle(
                             fontWeight: FontWeight.w600,
@@ -194,9 +187,9 @@ class _LoginPage extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Belum punya akun?"),
+                    const Text("Belum punya akun?"),
                     GestureDetector(
-                      child: Text(
+                      child: const Text(
                         " Daftar",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,

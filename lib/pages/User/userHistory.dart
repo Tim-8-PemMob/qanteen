@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:paginate_firestore/paginate_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class UserHistory extends StatefulWidget {
   @override
@@ -22,13 +23,14 @@ class _UserHistory extends State<UserHistory> {
 
   String formatTime(Timestamp time) {
     var dateTime = DateTime.parse(time.toDate().toString());
-    return DateFormat.yMMMMEEEEd().format(dateTime).toString();
+    return DateFormat.yMMMMEEEEd('id').format(dateTime).toString();
   }
 
   @override
   void initState() {
-    getUserUid();
     super.initState();
+    getUserUid();
+    initializeDateFormatting();
   }
 
   @override

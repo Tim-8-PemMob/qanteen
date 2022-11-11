@@ -66,7 +66,7 @@ class _StandOrderStreamBuilder extends State<StandOrderStreamBuilder>{
                     ),
                     child: InkWell(
                         child: SizedBox(
-                            height: 100,
+                            height: MediaQuery.of(context).size.height / 8,
                             child: Center(
                                 child: ListTile(
                                   leading: const Icon(Icons.restaurant_menu),

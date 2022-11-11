@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/pages/User/home/components/SizeConfig.dart';
 import 'package:qanteen/pages/User/menu.dart';

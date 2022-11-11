@@ -31,23 +31,25 @@ class _Body extends State<Body> {
   Future<List<dynamic>> maxRandomMenuPerStands(int randomGet) async {
     List listMenuRandom = [];
     var key = FirebaseFirestore.instance.collection("Menus").doc().id;
-    await FirebaseFirestore.instance.collection("Stands").get().then((res) async {
-      for (var data in res.docs) {
-        await FirebaseFirestore.instance.collection("Stands").doc(data.id).collection("Menus").where(FieldPath.documentId, isGreaterThanOrEqualTo: key).limit(randomGet).get().then((value) {
-          for (var menu in value.docs) {
-            Map menuMap = new Map();
-            menuMap['standId'] = data.id;
-            menuMap['menuId'] = data.id;
-            menuMap['standName'] = data.data()['name'];
-            menuMap['menuTotal'] = menu.data()['total'];
-            menuMap['menuImg'] = menu.data()['image'];
-            menuMap['menuName'] = menu.data()['name'];
-            menuMap['menuPrice'] = menu.data()['price'];
-            listMenuRandom.add(menuMap);
-          }
-        });
-      }
-    });
+    while(listMenuRandom.isEmpty) {
+      await FirebaseFirestore.instance.collection("Stands").get().then((res) async {
+        for (var data in res.docs) {
+          await FirebaseFirestore.instance.collection("Stands").doc(data.id).collection("Menus").where(FieldPath.documentId, isGreaterThanOrEqualTo: key).limit(randomGet).get().then((value) {
+            for (var menu in value.docs) {
+              Map menuMap = new Map();
+              menuMap['standId'] = data.id;
+              menuMap['menuId'] = menu.id;
+              menuMap['standName'] = data.data()['name'];
+              menuMap['menuTotal'] = menu.data()['total'];
+              menuMap['menuImg'] = menu.data()['image'];
+              menuMap['menuName'] = menu.data()['name'];
+              menuMap['menuPrice'] = menu.data()['price'];
+              listMenuRandom.add(menuMap);
+            }
+          });
+        }
+      });
+    }
     return listMenuRandom;
   }
 

@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/pages/Admin/editStand.dart';
 import 'package:qanteen/model/stand_model.dart';
+import 'package:qanteen/pages/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'addSeller.dart';
 
 Future<List<StandModel>> getStandFireStore() async {
@@ -17,6 +20,10 @@ Future<List<StandModel>> getStandFireStore() async {
     }
   });
   return listStand;
+}
+
+Future<void> signOut() async {
+  await FirebaseAuth.instance.signOut();
 }
 
 Future<String> deleteStandById(String standId) async {
@@ -54,6 +61,31 @@ class _Index extends State<Index> {
     getStandFireStore();
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            showDialog<String>(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('Logout'),
+                content: const Text('Logout ?'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                        signOut();
+                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
+                    },
+                    child: const Text('Logout'),
+                  ),
+                ],
+              ),
+            );
+          },
+          icon: const Icon(Icons.logout),
+        ),
         backgroundColor: Colors.red[700],
         title: const Text("Stand Makanan"),
         actions: [
@@ -62,7 +94,7 @@ class _Index extends State<Index> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (builder) => AddSeller()));
             },
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
           ),
         ],
       ),
@@ -93,7 +125,7 @@ class _Index extends State<Index> {
                               child: Center(
                                   child: ListTile(
                                 leading: const Icon(Icons.food_bank),
-                                title: Text("${data[index].name.toString()}"),
+                                title: Text(data[index].name.toString()),
                                 trailing: PopupMenuButton<int>(
                                     onSelected: (value) async {
                                       if (value == 1) {
@@ -110,15 +142,33 @@ class _Index extends State<Index> {
                                                   .showSnackBar(snackBar);
                                             }));
                                       } else if (value == 2) {
-                                        deleteStandById(data[index].id)
-                                            .then((msg) {
-                                          setState(() {
-                                            var snackBar =
-                                                SnackBar(content: Text(msg));
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(snackBar);
-                                          });
-                                        });
+                                        showDialog<String>(
+                                          context: context,
+                                          builder: (BuildContext context) => AlertDialog(
+                                            title: const Text('Delete'),
+                                            content: const Text('Delete ?'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(context, 'Cancel'),
+                                                child: const Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  deleteStandById(data[index].id)
+                                                      .then((msg) {
+                                                    setState(() {
+                                                      var snackBar =
+                                                      SnackBar(content: Text(msg));
+                                                      ScaffoldMessenger.of(context)
+                                                          .showSnackBar(snackBar);
+                                                    });
+                                                  });
+                                                },
+                                                child: const Text('Delete'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
                                       }
                                     },
                                     itemBuilder: (BuildContext context) =>

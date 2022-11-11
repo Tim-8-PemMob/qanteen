@@ -186,9 +186,12 @@ class _SellerMenu extends State<SellerMenu> {
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");
 
-    await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
-      'ownerFcmToken' : "",
-    });
+    var standData = await FirebaseFirestore.instance.collection("Stands").doc(standId);
+    if (standData != null) {
+      standData.update({
+        'ownerFcmToken' : "",
+      });
+    }
 
     await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
       'fcmToken' : "",
@@ -287,7 +290,7 @@ class _SellerMenu extends State<SellerMenu> {
                                   title: Text(
                                     capitalizeAllWord(
                                         data[index].name.toString()),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 19,
                                       fontWeight: FontWeight.w400,
                                     ),
@@ -299,7 +302,7 @@ class _SellerMenu extends State<SellerMenu> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 20,
                                       ),
                                       Text(
@@ -332,15 +335,34 @@ class _SellerMenu extends State<SellerMenu> {
                                                         .showSnackBar(snackBar);
                                                   }));
                                         } else if (value == 2) {
-                                          deleteMenu(standId, data[index].id)
-                                              .then((msg) {
-                                            setState(() {
-                                              var snackBar =
-                                                  SnackBar(content: Text(msg));
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(snackBar);
-                                            });
-                                          });
+                                          showDialog<String>(
+                                            context: context,
+                                            builder: (BuildContext context) => AlertDialog(
+                                              title: const Text('Delete'),
+                                              content: const Text('Delete ?'),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                                                  child: const Text('Cancel'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    deleteMenu(standId, data[index].id)
+                                                        .then((msg) {
+                                                      setState(() {
+                                                        var snackBar =
+                                                        SnackBar(content: Text(msg));
+                                                        ScaffoldMessenger.of(context)
+                                                            .showSnackBar(snackBar);
+                                                      });
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text('Delete'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
                                         }
                                       },
                                       itemBuilder: (BuildContext context) =>

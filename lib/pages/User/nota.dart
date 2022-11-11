@@ -14,6 +14,8 @@ import 'package:qanteen/pages/User/nota/folder_clipper.dart';
 import 'package:qanteen/pages/User/nota/invoice_clipper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
 
 class Nota extends StatefulWidget {
   final Timestamp timeOrder;
@@ -38,7 +40,7 @@ class _Nota extends State<Nota> {
 
   String formatTime(Timestamp time) {
     var dateTime = DateTime.parse(time.toDate().toString());
-    return DateFormat.yMMMEd().format(dateTime).toString();
+    return DateFormat.yMMMMEEEEd('id').format(dateTime).toString();
   }
 
   var listCart = List<NotaModel>.empty(growable: true);
@@ -127,6 +129,7 @@ class _Nota extends State<Nota> {
   void initState() {
     super.initState();
     getUserData();
+    initializeDateFormatting();
   }
 
   @override
@@ -146,198 +149,200 @@ class _Nota extends State<Nota> {
             )
           ],
         ),
-        body: Container(
-          margin: EdgeInsets.all(10),
-          child: FutureBuilder(
-            future: getDetailOrder(timeOrder),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: ClipPath(
-                      clipper: FolderClipper(),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        padding: EdgeInsets.only(top: 24),
-                        color: Color(0XFFEAE7EA),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildHeader(
-                              pengguna: "${snapshot.data![0].userName}",
-                            ),
-                            _buildAtasStruk(),
-                            Column(
+        body: SingleChildScrollView(
+            child: Container(
+              margin: EdgeInsets.all(10),
+              child: FutureBuilder(
+                future: getDetailOrder(timeOrder),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: ClipPath(
+                          clipper: FolderClipper(),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height,
+                            padding: EdgeInsets.only(top: 24),
+                            color: Color(0XFFEAE7EA),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ClipPath(
-                                  clipper: InvoiceContentClipper(),
-                                  child: Container(
-                                    color: Colors.white,
-                                    padding: EdgeInsets.all(24),
-                                    child: Column(
-                                      children: [
-                                        Row(
+                                _buildHeader(
+                                  pengguna: "${snapshot.data![0].userName}",
+                                ),
+                                _buildAtasStruk(),
+                                Column(
+                                  children: [
+                                    ClipPath(
+                                      clipper: InvoiceContentClipper(),
+                                      child: Container(
+                                        color: Colors.white,
+                                        padding: EdgeInsets.all(24),
+                                        child: Column(
                                           children: [
-                                            Icon(Icons.file_copy),
-                                            Text(
-                                              "Detail Nota",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge!
-                                                  .copyWith(
+                                            Row(
+                                              children: [
+                                                Icon(Icons.file_copy),
+                                                Text(
+                                                  "Detail Nota",
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge!
+                                                      .copyWith(
                                                       color: Colors.black),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    "Email Pengguna",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .caption,
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Text(emailUser ?? ""),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              width: .5,
-                                              color: Colors.black38,
-                                              height: 50,
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "Tanggal Struk",
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .caption,
-                                                    ),
-                                                    SizedBox(height: 4),
-                                                    Text(formatTime(timeOrder)),
-                                                  ],
                                                 ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                        Container(
-                                          width: double.infinity,
-                                          height: .4,
-                                          color: Colors.black,
-                                          margin: EdgeInsets.symmetric(
-                                              vertical: 20),
-                                        ),
-                                        Column(
-                                          children: [
-                                            ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount: snapshot.data!.length,
-                                              itemBuilder: (context, index) {
-                                                return Container(
-                                                  margin: EdgeInsets.only(
-                                                      bottom: 20),
-                                                  child: Row(
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                     children: [
-                                                      // Ini adalah bentuk nota
-                                                      Expanded(
-                                                          child: Text(
-                                                              "${snapshot.data![index].menu}\n ${snapshot.data![index].stand}")),
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.1,
-                                                        child: Text(
-                                                            "${snapshot.data![index].totalBeli.toString()}x"),
+                                                      Text(
+                                                        "Email Pengguna",
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .caption,
                                                       ),
-                                                      Expanded(
-                                                        child: Text(
-                                                            "Rp. ${snapshot.data![index].totalHarga.toString()}"),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                            "Rp. ${snapshot.data![index].totalHarga * snapshot.data![index].totalBeli}"),
-                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Text(emailUser ?? ""),
                                                     ],
                                                   ),
-                                                );
-                                              },
+                                                ),
+                                                Container(
+                                                  width: .5,
+                                                  color: Colors.black38,
+                                                  height: 50,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    alignment:
+                                                    Alignment.centerRight,
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(
+                                                          "Tanggal Struk",
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .caption,
+                                                        ),
+                                                        SizedBox(height: 4),
+                                                        Text(formatTime(timeOrder)),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
                                             ),
                                             Container(
                                               width: double.infinity,
-                                              color: Colors.black38,
-                                              height: .5,
+                                              height: .4,
+                                              color: Colors.black,
                                               margin: EdgeInsets.symmetric(
-                                                  vertical: 12),
+                                                  vertical: 20),
                                             ),
-                                            Row(
-                                              mainAxisAlignment:
+                                            Column(
+                                              children: [
+                                                ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: snapshot.data!.length,
+                                                  itemBuilder: (context, index) {
+                                                    return Container(
+                                                      margin: EdgeInsets.only(
+                                                          bottom: 20),
+                                                      child: Row(
+                                                        children: [
+                                                          // Ini adalah bentuk nota
+                                                          Expanded(
+                                                              child: Text(
+                                                                  "${snapshot.data![index].menu}\n ${snapshot.data![index].stand}")),
+                                                          Container(
+                                                            width: MediaQuery.of(
+                                                                context)
+                                                                .size
+                                                                .width *
+                                                                0.1,
+                                                            child: Text(
+                                                                "${snapshot.data![index].totalBeli.toString()}x"),
+                                                          ),
+                                                          Expanded(
+                                                            child: Text(
+                                                                "Rp. ${snapshot.data![index].totalHarga.toString()}"),
+                                                          ),
+                                                          Expanded(
+                                                            child: Text(
+                                                                "Rp. ${snapshot.data![index].totalHarga * snapshot.data![index].totalBeli}"),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                                Container(
+                                                  width: double.infinity,
+                                                  color: Colors.black38,
+                                                  height: .5,
+                                                  margin: EdgeInsets.symmetric(
+                                                      vertical: 12),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,
-                                              children: [
-                                                Expanded(child: Text("Total")),
-                                                Container(
-                                                  width: MediaQuery.of(context)
+                                                  children: [
+                                                    Expanded(child: Text("Total")),
+                                                    Container(
+                                                      width: MediaQuery.of(context)
                                                           .size
                                                           .width *
-                                                      0.1,
-                                                  child: Text(""),
-                                                ),
-                                                Expanded(
-                                                  child: Text(""),
-                                                ),
-                                                Expanded(
-                                                  child: Text("Rp. ${countTotalPrice(listCart)}"),
+                                                          0.1,
+                                                      child: Text(""),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(""),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text("Rp. ${countTotalPrice(listCart)}"),
+                                                    )
+                                                  ],
                                                 )
                                               ],
-                                            )
+                                            ),
                                           ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text("Terjadi Error"),
-                );
-              } else if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else {
-                return Center(
-                  child: Text("Empty"),
-                );
-              }
-            },
-          ),
-        ));
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text("Terjadi Error"),
+                    );
+                  } else if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    return Center(
+                      child: Text("Empty"),
+                    );
+                  }
+                },
+              ),
+            )),
+            );
   }
 }
 
