@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:qanteen/pages/Admin/index.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:input_history_text_field/input_history_text_field.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -23,7 +24,8 @@ class _LoginPage extends State<LoginPage> {
   Future<dynamic> signIn(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     try {
-      UserCredential user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential user = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
       FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           print('User is currently signed out!');
@@ -31,14 +33,18 @@ class _LoginPage extends State<LoginPage> {
           print('User is signed in!');
         }
       });
-      final userData = await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).get();
+      final userData = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(user.user!.uid)
+          .get();
       var data = jsonDecode(jsonEncode(userData.data()));
       var logedUser = user.user;
       if (logedUser != null) {
         userUid = user.user!.uid;
         await addFcmToken(data['role'], data['standId'], userUid);
         await prefs.setString("userUid", logedUser.uid);
-      };
+      }
+      ;
       if (data['role'] == 'seller') standId = data['standId'];
       return data;
     } catch (e) {
@@ -51,7 +57,7 @@ class _LoginPage extends State<LoginPage> {
     print('fcm token = $fcmToken');
 
     await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
-      'fcmToken' : fcmToken,
+      'fcmToken': fcmToken,
     });
 
     if(role == 'seller') {
@@ -63,8 +69,7 @@ class _LoginPage extends State<LoginPage> {
       }
     }
 
-    FirebaseMessaging.instance.onTokenRefresh
-        .listen((fcmToken) {
+    FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
       // TODO: If necessary send token to application server.
 
       // Note: This callback is fired at each app startup and whenever a new
@@ -241,12 +246,20 @@ Widget inputFile(
         controller: textEditingController,
         obscureText: obscureText,
         decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade400),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
             ),
-            border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400))),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
+            ),
+          ),
+          border: InputBorder.none,
+          enabled: true,
+        ),
       ),
       SizedBox(
         height: 10,
