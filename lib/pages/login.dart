@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qanteen/pages/Seller/sellerMenu.dart';
 import 'package:qanteen/pages/User/home/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,8 +25,12 @@ class _LoginPage extends State<LoginPage> {
   Future<Map> signIn(String email, String password) async {
     late String message;
     Map resMap = new Map();
-    UserCredential? user;
-    final prefs = await SharedPreferences.getInstance();
+    if(email == "" || password == "") {
+      message = "Input tidak boleh kosong";
+      resMap['res'] = message;
+    } else {
+      UserCredential? user;
+      final prefs = await SharedPreferences.getInstance();
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((res) {
         user = res;
         message = 'Login complete';
@@ -46,6 +51,7 @@ class _LoginPage extends State<LoginPage> {
       }
       resMap['res'] = message;
       print(resMap);
+    }
       return resMap;
   }
 
@@ -163,9 +169,7 @@ class _LoginPage extends State<LoginPage> {
                               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
                             }
                           } else {
-                            var snackBar = SnackBar(content: Text(res['res']));
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
+                            Fluttertoast.showToast(msg: res['res']);
                           }
                         });
                       },

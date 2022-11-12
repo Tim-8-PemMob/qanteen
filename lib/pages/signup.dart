@@ -3,29 +3,36 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qanteen/pages/login.dart';
 
-Future<void> signUp(String name, String email, String password, String confirmPassword) async {
+Future<String> signUp(String name, String email, String password, String confirmPassword) async {
   final fcmToken = await FirebaseMessaging.instance.getToken();
-
-  try {
+  late UserCredential user;
+  late String message;
+  if(name == "" || email == "" || password == "" || confirmPassword == "") {
+    message = "Input tidak boleh kosong";
+  } else {
     if (password == confirmPassword) {
-      UserCredential user = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-      print("data user : ${user}");
-      print("data user.user ${user.user}");
-      await FirebaseFirestore.instance
-          .collection("Users")
-          .doc(user.user!.uid)
-          .set({
-        "name": name,
-        "role" : "user",
-        'fcmToken' : fcmToken,
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password).then((res) async {
+        user = res;
+        message = "Register Complete";
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(user.user!.uid)
+            .set({
+          "name": name,
+          "role" : "user",
+          'fcmToken' : fcmToken,
+        });
+      }, onError: (e) {
+        message = e.message.toString();
       });
+    } else {
+      message = "Periksa lagi password anda";
     }
-  } catch (e) {
-    print(e);
   }
+  return message;
 }
 
 class SignUpPage extends StatefulWidget {
@@ -116,8 +123,9 @@ class _SignUpPage extends State<SignUpPage> {
                   minWidth: double.infinity,
                   height: 60,
                   onPressed: () {
-                    signUp(
-                        tName.text, tEmail.text, tPassword.text, tConfirm.text);
+                    signUp(tName.text, tEmail.text, tPassword.text, tConfirm.text).then((msg) {
+                      Fluttertoast.showToast(msg: msg);
+                    });
                   },
                   color: Colors.red[700],
                   elevation: 0,
