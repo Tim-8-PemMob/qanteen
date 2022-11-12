@@ -79,13 +79,16 @@ class _myProfileState extends State<myProfile> {
     final String? userUid = prefs.getString("userUid");
 
     if (standId != null) {
-      await FirebaseFirestore.instance.collection("Stands").doc(standId).update({
-        'ownerFcmToken' : "",
+      await FirebaseFirestore.instance
+          .collection("Stands")
+          .doc(standId)
+          .update({
+        'ownerFcmToken': "",
       });
     }
 
     await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
-      'fcmToken' : "",
+      'fcmToken': "",
     });
   }
 
@@ -222,7 +225,7 @@ class _myProfileState extends State<myProfile> {
                       ],
                     ),
                     SizedBox(
-                      height: getProportionateScreenHeight(80),
+                      height: getProportionateScreenHeight(90),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -240,7 +243,11 @@ class _myProfileState extends State<myProfile> {
                                 onPressed: () {
                                   deleteFcmToken(null).then((value) {
                                     signOut();
-                                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => LoginPage()),
+                                        (Route<dynamic> route) => false);
                                   });
                                 },
                                 child: const Text('Logout'),

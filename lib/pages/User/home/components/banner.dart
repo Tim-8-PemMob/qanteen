@@ -22,8 +22,8 @@ class HomeBanner extends StatelessWidget {
             autoPlayAnimationDuration: const Duration(milliseconds: 800),
             autoPlayCurve: Curves.easeInOut),
         items: [
-          "assets/carousel_slider/gbr1.jpg",
-          "assets/carousel_slider/gbr2.jpg",
+          "assets/carousel_slider/gbr4.jpg",
+          "assets/carousel_slider/gbr5.jpg",
           "assets/carousel_slider/gbr3.jpg"
         ].map((i) {
           return Builder(

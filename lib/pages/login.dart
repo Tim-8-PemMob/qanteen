@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:qanteen/pages/Admin/index.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:input_history_text_field/input_history_text_field.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -30,13 +31,6 @@ class _LoginPage extends State<LoginPage> {
         message = 'Login complete';
       }, onError: (e) {
         message = e.message.toString();
-      });
-      FirebaseAuth.instance.authStateChanges().listen((User? user) {
-        if (user == null) {
-          print('User is currently signed out!');
-        } else {
-          print('User is signed in!');
-        }
       });
       if (user != null) {
         final userData = await FirebaseFirestore.instance.collection("Users").doc(user!.user!.uid).get();
@@ -60,7 +54,7 @@ class _LoginPage extends State<LoginPage> {
     print('fcm token = $fcmToken');
 
     await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
-      'fcmToken' : fcmToken,
+      'fcmToken': fcmToken,
     });
 
     if(role == 'seller') {
@@ -72,8 +66,7 @@ class _LoginPage extends State<LoginPage> {
       }
     }
 
-    FirebaseMessaging.instance.onTokenRefresh
-        .listen((fcmToken) {
+    FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
       // TODO: If necessary send token to application server.
 
       // Note: This callback is fired at each app startup and whenever a new
@@ -248,12 +241,20 @@ Widget inputFile(
         controller: textEditingController,
         obscureText: obscureText,
         decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade400),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
             ),
-            border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400))),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
+            ),
+          ),
+          border: InputBorder.none,
+          enabled: true,
+        ),
       ),
       SizedBox(
         height: 10,

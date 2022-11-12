@@ -13,7 +13,6 @@ class Body extends StatefulWidget {
 }
 
 class _Body extends State<Body> {
-
   Future<List<StandModel>> getStandFireStore() async {
     var listStand = List<StandModel>.empty(growable: true);
     await FirebaseFirestore.instance.collection("Stands").get().then((data) {
@@ -102,32 +101,33 @@ class _Body extends State<Body> {
                   return const Center(
                     child: Text("..."),
                   );
-                } else if(snapshot.hasData && snapshot.data != null) {
-                  return Row(
-                      children: [
-                        Expanded(
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height / 6,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width * (15 / 375)),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: snapshot.data!.length,
-                                  itemBuilder: (context, index) {
-                                    return categoriesContainer(
-                                      image: snapshot.data![index]['menuImg'],
-                                      name: "${snapshot.data![index]['menuName']}",
-                                      standId: snapshot.data![index]['standId'],
-                                      menuId: snapshot.data![index]['menuId'],
-                                      standName: snapshot.data![index]['standName'],
-                                    );
-                                  },),
-                              )
-                            )
-                        ),
-                      ]
-                  );
+                } else if (snapshot.hasData && snapshot.data != null) {
+                  return Row(children: [
+                    Expanded(
+                        child: SizedBox(
+                            height: MediaQuery.of(context).size.height / 6,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: MediaQuery.of(context).size.width *
+                                      (15 / 375)),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return categoriesContainer(
+                                    image: snapshot.data![index]['menuImg'],
+                                    name:
+                                        "${snapshot.data![index]['menuName']}",
+                                    standId: snapshot.data![index]['standId'],
+                                    menuId: snapshot.data![index]['menuId'],
+                                    standName: snapshot.data![index]
+                                        ['standName'],
+                                  );
+                                },
+                              ),
+                            ))),
+                  ]);
                 } else {
                   return const Center(
                     child: Text("Terjadi Error"),
@@ -177,7 +177,7 @@ class _Body extends State<Body> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          mainAxisExtent: 230,
+                          mainAxisExtent: 260,
                         ),
                         itemCount: data.length,
                         itemBuilder: (context, index) {

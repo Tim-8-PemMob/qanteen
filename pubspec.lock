@@ -436,6 +436,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.6.1"
+  input_history_text_field:
+    dependency: "direct dev"
+    description:
+      name: input_history_text_field
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0"
   intl:
     dependency: "direct main"
     description:

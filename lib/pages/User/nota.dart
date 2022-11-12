@@ -70,12 +70,12 @@ class _Nota extends State<Nota> {
             .get()
             .then((refData) {
           NotaModel notaModel = NotaModel(
-              userName: refData.data()!['userName'],
-              stand: refData.data()!['standName'],
-              menu: refData.data()!['menuName'],
-              hargaMenu: refData.data()!['menuPrice'],
-              totalBeli: refData.data()!['total'],
-              totalHarga: refData.data()!['menuPrice'] * refData.data()!['total'],
+            userName: refData.data()!['userName'],
+            stand: refData.data()!['standName'],
+            menu: refData.data()!['menuName'],
+            hargaMenu: refData.data()!['menuPrice'],
+            totalBeli: refData.data()!['total'],
+            totalHarga: refData.data()!['menuPrice'] * refData.data()!['total'],
           );
           listData.add(notaModel);
         });
@@ -267,7 +267,7 @@ class _Nota extends State<Nota> {
                                                                 context)
                                                                 .size
                                                                 .width *
-                                                                0.1,
+                                                                0.07,
                                                             child: Text(
                                                                 "${snapshot.data![index].totalBeli.toString()}x"),
                                                           ),

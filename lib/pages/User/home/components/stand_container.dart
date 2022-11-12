@@ -63,7 +63,7 @@ class StandContainer extends StatelessWidget {
                     ),
                     child: Image.network(
                       image,
-                      height: 150,
+                      height: MediaQuery.of(context).size.height * 0.2,
                       width: double.infinity,
                       fit: BoxFit.fill,
                     ),
