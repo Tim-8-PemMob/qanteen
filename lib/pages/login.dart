@@ -20,10 +20,17 @@ class _LoginPage extends State<LoginPage> {
   TextEditingController tPassword = TextEditingController(text: "");
 
   late String standId, userUid;
-  Future<dynamic> signIn(String email, String password) async {
+  Future<Map> signIn(String email, String password) async {
+    late String message;
+    Map resMap = new Map();
+    UserCredential? user;
     final prefs = await SharedPreferences.getInstance();
-    try {
-      UserCredential user = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((res) {
+        user = res;
+        message = 'Login complete';
+      }, onError: (e) {
+        message = e.message.toString();
+      });
       FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           print('User is currently signed out!');
@@ -31,19 +38,21 @@ class _LoginPage extends State<LoginPage> {
           print('User is signed in!');
         }
       });
-      final userData = await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).get();
-      var data = jsonDecode(jsonEncode(userData.data()));
-      var logedUser = user.user;
-      if (logedUser != null) {
-        userUid = user.user!.uid;
-        await addFcmToken(data['role'], data['standId'], userUid);
-        await prefs.setString("userUid", logedUser.uid);
-      };
-      if (data['role'] == 'seller') standId = data['standId'];
-      return data;
-    } catch (e) {
-      print(e);
-    }
+      if (user != null) {
+        final userData = await FirebaseFirestore.instance.collection("Users").doc(user!.user!.uid).get();
+        var data = jsonDecode(jsonEncode(userData.data()));
+        var logedUser = user!.user;
+        if (logedUser != null) {
+          userUid = user!.user!.uid;
+          await addFcmToken(data['role'], data['standId'], userUid);
+          await prefs.setString("userUid", logedUser.uid);
+        };
+        if (data['role'] == 'seller') standId = data['standId'];
+        resMap['data'] = data;
+      }
+      resMap['res'] = message;
+      print(resMap);
+      return resMap;
   }
 
   Future<void> addFcmToken(String role, String? standId, String userUid) async {
@@ -152,18 +161,16 @@ class _LoginPage extends State<LoginPage> {
                       onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
                         signIn(tEmail.text, tPassword.text).then((res) {
-                          if (res != null) {
-                            if (res['role'] == "user") {
+                          if (res['data'] != null) {
+                            if (res['data']['role'] == "user") {
                               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => home(userUid: userUid)), (Route<dynamic> route) => false);
-                            } else if (res['role'] == 'seller') {
+                            } else if (res['data']['role'] == 'seller') {
                               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SellerMenu(standId: standId)), (Route<dynamic> route) => false);
-                            } else if(res['role'] == 'admin') {
+                            } else if(res['data']['role'] == 'admin') {
                               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
                             }
                           } else {
-                            var snackBar = const SnackBar(
-                                content: Text(
-                                    "Mohon Periksa Lagi User dan Email Anda"));
+                            var snackBar = SnackBar(content: Text(res['res']));
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(snackBar);
                           }

@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:qanteen/pages/User/nota.dart';
-import 'package:qanteen/pages/User/userOrder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailOrder extends StatefulWidget {

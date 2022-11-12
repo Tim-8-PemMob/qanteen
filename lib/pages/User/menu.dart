@@ -1,8 +1,6 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qanteen/pages/User/cart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../model/menu_model.dart';
@@ -239,23 +237,9 @@ class _Menu extends State<Menu> {
                                                 FocusManager
                                                     .instance.primaryFocus
                                                     ?.unfocus();
-                                                if (textEditingControllers[
-                                                        data[index].id] !=
-                                                    null) {
-                                                  if (int.parse(
-                                                          textEditingControllers[
-                                                                  data[index]
-                                                                      .id]!
-                                                              .text) >=
-                                                      1) {
-                                                    if (await checkTotalMenu(
-                                                        standId,
-                                                        data[index].id,
-                                                        int.parse(
-                                                            textEditingControllers[
-                                                                    data[index]
-                                                                        .id]!
-                                                                .text))) {
+                                                if (textEditingControllers[data[index].id]!.text != "") {
+                                                  if (int.parse(textEditingControllers[data[index].id]!.text) >= 1) {
+                                                    if (await checkTotalMenu(standId, data[index].id, int.parse(textEditingControllers[data[index].id]!.text))) {
                                                       addCart(
                                                               standId,
                                                               data[index].id,
@@ -270,50 +254,17 @@ class _Menu extends State<Menu> {
                                                                   data[index]
                                                                       .id]!
                                                               .text = "1";
-                                                          var snackBar = SnackBar(
-                                                              duration:
-                                                                  const Duration(
-                                                                      seconds:
-                                                                          2),
-                                                              content:
-                                                                  Text(msg));
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(
-                                                                  snackBar);
+                                                          Fluttertoast.showToast(msg: msg);
                                                         });
                                                       });
                                                     } else {
-                                                      var snackBar = SnackBar(
-                                                          duration:
-                                                              const Duration(
-                                                                  seconds: 2),
-                                                          content: Text(
-                                                              "Total Melebihi Total Menu"));
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                              snackBar);
+                                                      Fluttertoast.showToast(msg: "Total Melebihi Total Menu");
                                                     }
                                                   } else {
-                                                    var snackBar = SnackBar(
-                                                        duration:
-                                                            const Duration(
-                                                                seconds: 2),
-                                                        content: Text(
-                                                            "Total Tidak Boleh Dibawah 1"));
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(snackBar);
+                                                    Fluttertoast.showToast(msg: "Total Tidak Boleh Dibawah 1");
                                                   }
                                                 } else {
-                                                  var snackBar = SnackBar(
-                                                      duration: const Duration(
-                                                          seconds: 2),
-                                                      content: Text(
-                                                          "Total Tidak Boleh Kosong"));
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(snackBar);
+                                                  Fluttertoast.showToast(msg: "Total Tidak Boleh Kosong");
                                                 }
                                               },
                                               icon:

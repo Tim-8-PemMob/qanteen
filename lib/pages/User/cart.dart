@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qanteen/service/notificationService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../model/cart_model.dart';
@@ -268,8 +269,7 @@ class _Cart extends State<Cart> {
                                             onTap: () {
                                               removeCart(data[index].standId, data[index].menuId, data[index].id, data[index].total).then((msg) {
                                                 setState(() {
-                                                  var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text(msg));
-                                                  ScaffoldMessenger.of(buildContext).showSnackBar(snackBar);
+                                                  Fluttertoast.showToast(msg: msg);
                                                 });
                                               });
                                             },
@@ -287,8 +287,7 @@ class _Cart extends State<Cart> {
                                                   onTap: () {
                                                     changeTotalCart(data[index].standId, data[index].menuId, data[index].id, 1).then((msg) {
                                                       setState(() {
-                                                        var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text(msg));
-                                                        ScaffoldMessenger.of(buildContext).showSnackBar(snackBar);
+                                                        Fluttertoast.showToast(msg: msg);
                                                       });
                                                     });
                                                   },
@@ -302,8 +301,7 @@ class _Cart extends State<Cart> {
                                                   // TODO: ganti parameter terakhir (total reduce) menjadi dinamis ???
                                                   changeTotalCart(data[index].standId, data[index].menuId, data[index].id, -1).then((msg) {
                                                     setState(() {
-                                                      var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text(msg));
-                                                      ScaffoldMessenger.of(buildContext).showSnackBar(snackBar);
+                                                      Fluttertoast.showToast(msg: msg);
                                                     });
                                                   });
                                                 },
@@ -369,8 +367,7 @@ class _Cart extends State<Cart> {
                                     onPressed: () async {
                                       await placeOrder().then((msg) {
                                         setState(() {
-                                          var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text(msg));
-                                          ScaffoldMessenger.of(buildContext).showSnackBar(snackBar);
+                                          Fluttertoast.showToast(msg: msg);
                                         });
                                       });
                                       Navigator.pop(context);

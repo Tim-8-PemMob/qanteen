@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:qanteen/pages/Admin/index.dart';
 import 'package:qanteen/pages/Seller/sellerMenu.dart';
 import 'package:qanteen/pages/User/home/home.dart';
-import 'package:qanteen/pages/homepage.dart';
 import 'package:qanteen/pages/login.dart';
 import 'package:qanteen/pages/signup.dart';
 import 'package:qanteen/pages/slider.dart';
@@ -48,9 +47,11 @@ class _LandingState extends State<Landing> {
       } else {
         await FirebaseFirestore.instance.collection("Users").doc(user.uid).get().then((data) {
           if(data.data()!['role'] == 'seller') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => SellerMenu(standId: data.data()!['standId'])));
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SellerMenu(standId: data.data()!['standId'])), (Route<dynamic> route) => false);
+          } else if(data.data()!['role'] == 'user') {
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => home(userUid: user.uid)), (Route<dynamic> route) => false);
           } else {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => home(userUid: user.uid)));
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Index()), (Route<dynamic> route) => false);
           }
         });
         print('User is signed in!');
@@ -110,11 +111,7 @@ class _LandingState extends State<Landing> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => WelcomePage()),
-                              );
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => WelcomePage()), (Route<dynamic> route) => false);
                             },
                             child: const Text('Start!'),
                             style: ElevatedButton.styleFrom(

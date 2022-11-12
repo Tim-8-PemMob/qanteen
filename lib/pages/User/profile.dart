@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qanteen/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:qanteen/pages/User/home/components/SizeConfig.dart';
@@ -17,6 +19,9 @@ class myProfile extends StatefulWidget {
 
 class _myProfileState extends State<myProfile> {
   bool isObscurePassword = true;
+
+  TextEditingController tUsername = TextEditingController(text: "");
+  TextEditingController tPassword = TextEditingController(text: "");
 
   Future<Map> getsUserData() async {
     Map mapData = new Map();
@@ -36,6 +41,33 @@ class _myProfileState extends State<myProfile> {
     });
 
     return mapData;
+  }
+
+  Future<String> updateUserData(String password, String username) async {
+    late var message;
+    final pref = await SharedPreferences.getInstance();
+    final String userUid = pref.getString("userUid")!;
+
+    final User user = FirebaseAuth.instance.currentUser!;
+    if(password != "") {
+      await user.updatePassword(password).then((value) {
+        message = "Data anda berhasil di edit";
+      }, onError: (e) {
+        message = "Terjadi kesalahan $e";
+      });
+    }
+
+    if(username != "") {
+      await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
+        'name' : username,
+      }).then((value) {
+        message = "Data anda berhasil di edit";
+      }, onError: (e) {
+        message = "Terjadi kesalahan $e";
+      });
+    }
+
+    return message;
   }
 
   Future<void> signOut() async {
@@ -128,14 +160,14 @@ class _myProfileState extends State<myProfile> {
                         (snapshot.data != null)
                             ? snapshot.data!['username']
                             : "...",
-                        false),
+                        false, tUsername),
                     buildTextField(
                         "Email",
                         (snapshot.data != null)
                             ? snapshot.data!['email']
                             : "...",
-                        false),
-                    buildTextField("Password", "********", true),
+                        false, null),
+                    buildTextField("Password", "********", true, tPassword),
                     SizedBox(
                       height: 30,
                     ),
@@ -159,7 +191,17 @@ class _myProfileState extends State<myProfile> {
                                   borderRadius: BorderRadius.circular(20))),
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            if(tPassword.text != "" || tUsername.text != "") {
+                              updateUserData(tPassword.text, tUsername.text).then((msg) {
+                                setState(() {
+                                  tUsername.text = "";
+                                  tPassword.text = "";
+                                  Fluttertoast.showToast(msg: msg);
+                                });
+                              });
+                            }
+                          },
                           child: Text(
                             "SAVE",
                             style: TextStyle(
@@ -240,11 +282,11 @@ class _myProfileState extends State<myProfile> {
     );
   }
 
-  Widget buildTextField(
-      String labelText, String placeHolder, bool isPasswordField) {
+  Widget buildTextField(String labelText, String placeHolder, bool isPasswordField, TextEditingController? textEditingController) {
     return Padding(
       padding: EdgeInsets.only(bottom: 30),
       child: TextField(
+        controller: textEditingController,
         obscureText: isPasswordField ? isObscurePassword : false,
         decoration: InputDecoration(
           suffixIcon: isPasswordField

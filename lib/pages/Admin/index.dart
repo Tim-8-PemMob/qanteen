@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:qanteen/pages/Admin/editStand.dart';
 import 'package:qanteen/model/stand_model.dart';
 import 'package:qanteen/pages/login.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'addSeller.dart';
 
 Future<List<StandModel>> getStandFireStore() async {

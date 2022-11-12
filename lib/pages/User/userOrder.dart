@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qanteen/pages/User/detailOrder.dart';
-
-import '../../model/cart_model.dart';
 
 class UserOrder extends StatefulWidget {
   final String userUid;
