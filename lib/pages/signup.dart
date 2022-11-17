@@ -6,15 +6,18 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qanteen/pages/login.dart';
 
-Future<String> signUp(String name, String email, String password, String confirmPassword) async {
+Future<String> signUp(
+    String name, String email, String password, String confirmPassword) async {
   final fcmToken = await FirebaseMessaging.instance.getToken();
   late UserCredential user;
   late String message;
-  if(name == "" || email == "" || password == "" || confirmPassword == "") {
+  if (name == "" || email == "" || password == "" || confirmPassword == "") {
     message = "Input tidak boleh kosong";
   } else {
     if (password == confirmPassword) {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password).then((res) async {
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((res) async {
         user = res;
         message = "Register Complete";
         await FirebaseFirestore.instance
@@ -22,8 +25,8 @@ Future<String> signUp(String name, String email, String password, String confirm
             .doc(user.user!.uid)
             .set({
           "name": name,
-          "role" : "user",
-          'fcmToken' : fcmToken,
+          "role": "user",
+          'fcmToken': fcmToken,
         });
       }, onError: (e) {
         message = e.message.toString();
@@ -123,7 +126,9 @@ class _SignUpPage extends State<SignUpPage> {
                   minWidth: double.infinity,
                   height: 60,
                   onPressed: () {
-                    signUp(tName.text, tEmail.text, tPassword.text, tConfirm.text).then((msg) {
+                    signUp(tName.text, tEmail.text, tPassword.text,
+                            tConfirm.text)
+                        .then((msg) {
                       Fluttertoast.showToast(msg: msg);
                     });
                   },
@@ -185,12 +190,20 @@ Widget inputFile(
         controller: textEditingController,
         obscureText: obscureText,
         decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade400),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
             ),
-            border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400))),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
+            ),
+          ),
+          border: InputBorder.none,
+          enabled: true,
+        ),
       ),
       SizedBox(
         height: 10,

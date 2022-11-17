@@ -32,11 +32,26 @@ class _SearchResult extends State<SearchResult> {
 
   Future<List<dynamic>> getMenuByName(String name) async {
     List listMenu = [];
-    await FirebaseFirestore.instance.collection("Stands").get().then((res) async {
+    await FirebaseFirestore.instance
+        .collection("Stands")
+        .get()
+        .then((res) async {
       for (var doc in res.docs) {
-        await FirebaseFirestore.instance.collection("Stands").doc(doc.id).collection("Menus").orderBy('name', descending: false).where('name', isGreaterThanOrEqualTo: name).where('name', isLessThanOrEqualTo: name + '\uf8ff').get().then((value) async {
+        await FirebaseFirestore.instance
+            .collection("Stands")
+            .doc(doc.id)
+            .collection("Menus")
+            .orderBy('name', descending: false)
+            .where('name', isGreaterThanOrEqualTo: name)
+            .where('name', isLessThanOrEqualTo: name + '\uf8ff')
+            .get()
+            .then((value) async {
           late String standName;
-          await FirebaseFirestore.instance.collection("Stands").doc(doc.id).get().then((stand) {
+          await FirebaseFirestore.instance
+              .collection("Stands")
+              .doc(doc.id)
+              .get()
+              .then((stand) {
             standName = stand!['name'];
           });
           for (var menu in value.docs) {
@@ -57,13 +72,14 @@ class _SearchResult extends State<SearchResult> {
     listMenu.forEach((str) {
       var textEditingController = new TextEditingController(text: "1");
       //str['standId'] = id stand
-      textEditingControllers.putIfAbsent(str['standId'], () => textEditingController);
+      textEditingControllers.putIfAbsent(
+          str['standId'], () => textEditingController);
       return textFields.add(TextField(
         controller: textEditingController,
         textAlign: TextAlign.center,
       ));
     });
-  return listMenu;
+    return listMenu;
   }
 
   Future<void> reducePortion(
@@ -152,17 +168,17 @@ class _SearchResult extends State<SearchResult> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.red[700],
         title: Text("Search Result"),
       ),
       body: FutureBuilder(
         future: getMenuByName(search),
         builder: (context, snapshot) {
-          if(snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if(snapshot.hasData && snapshot.data!.isNotEmpty) {
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
@@ -172,8 +188,7 @@ class _SearchResult extends State<SearchResult> {
                       side: BorderSide(
                         color: Theme.of(context).colorScheme.outline,
                       ),
-                      borderRadius:
-                      const BorderRadius.all(Radius.circular(12)),
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
                     ),
                     child: InkWell(
                         child: SizedBox(
@@ -183,8 +198,7 @@ class _SearchResult extends State<SearchResult> {
                                 dense: true,
                                 visualDensity: VisualDensity(vertical: 3),
                                 leading: ClipRRect(
-                                  borderRadius:
-                                  BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(6),
                                   child: Image.network(
                                     snapshot.data![index]['menuImg'],
                                     width: 80,
@@ -204,8 +218,7 @@ class _SearchResult extends State<SearchResult> {
                                   mainAxisSize: MainAxisSize.min,
                                   // mainAxisAlignment:
                                   // MainAxisAlignment.spaceEvenly,
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const SizedBox(
                                       height: 5,
@@ -218,67 +231,115 @@ class _SearchResult extends State<SearchResult> {
                                     Text(snapshot.data![index]['standName']),
                                   ],
                                 ),
-                                trailing: (snapshot.data![index]['menuTotal'] >= 1)
+                                trailing: (snapshot.data![index]['menuTotal'] >=
+                                        1)
                                     ? Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(
-                                        width: 60,
-                                        child: textFields[index]),
-                                    IconButton(
-                                      onPressed: () async {FocusManager.instance.primaryFocus?.unfocus();
-                                        if (textEditingControllers[snapshot.data![index]['standId']] != null) {
-                                          if (int.parse(textEditingControllers[snapshot.data![index]['standId']]!.text) >= 1) {
-                                            if (await checkTotalMenu(snapshot.data![index]['standId'], snapshot.data![index]['menuId'], int.parse(textEditingControllers[snapshot.data![index]['standId']]!.text))) {
-                                              addCart(snapshot.data![index]['standId'], snapshot.data![index]['menuId'],
-                                                  int.parse(textEditingControllers[snapshot.data![index]['standId']]!.text), snapshot.data![index]['standName']).then((msg) {
-                                                setState(() {
-                                                  textEditingControllers[snapshot.data![index]['standId']]!.text = "1";
-                                                  var snackBar = SnackBar(duration: const Duration(seconds: 2), content: Text(msg));
-                                                  ScaffoldMessenger.of(
-                                                      context)
-                                                      .showSnackBar(
-                                                      snackBar);
-                                                });
-                                              });
-                                            } else {
-                                              var snackBar = SnackBar(
-                                                  duration: const Duration(seconds: 2),
-                                                  content: Text(
-                                                      "Total Melebihi Total Menu"));
-                                              ScaffoldMessenger.of(
-                                                  context)
-                                                  .showSnackBar(
-                                                  snackBar);
-                                            }
-                                          } else {
-                                            var snackBar = SnackBar(
-                                                duration: const Duration(seconds: 2),
-                                                content: Text(
-                                                    "Total Tidak Boleh Dibawah 1"));
-                                            ScaffoldMessenger.of(
-                                                context)
-                                                .showSnackBar(snackBar);
-                                          }
-                                        } else {
-                                          var snackBar = SnackBar(
-                                              duration: const Duration(seconds: 2),
-                                              content: Text(
-                                                  "Total Tidak Boleh Kosong"));
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(snackBar);
-                                        }
-                                      },
-                                      icon:
-                                      Icon(Icons.add_shopping_cart),
-                                    ),
-                                  ],
-                                )
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                              width: 60,
+                                              child: textFields[index]),
+                                          IconButton(
+                                            onPressed: () async {
+                                              FocusManager.instance.primaryFocus
+                                                  ?.unfocus();
+                                              if (textEditingControllers[
+                                                      snapshot.data![index]
+                                                          ['standId']] !=
+                                                  null) {
+                                                if (int.parse(
+                                                        textEditingControllers[
+                                                                snapshot.data![
+                                                                        index][
+                                                                    'standId']]!
+                                                            .text) >=
+                                                    1) {
+                                                  if (await checkTotalMenu(
+                                                      snapshot.data![index]
+                                                          ['standId'],
+                                                      snapshot.data![index]
+                                                          ['menuId'],
+                                                      int.parse(
+                                                          textEditingControllers[
+                                                                  snapshot.data![
+                                                                          index]
+                                                                      [
+                                                                      'standId']]!
+                                                              .text))) {
+                                                    addCart(
+                                                            snapshot.data![
+                                                                    index]
+                                                                ['standId'],
+                                                            snapshot.data![
+                                                                    index]
+                                                                ['menuId'],
+                                                            int.parse(textEditingControllers[
+                                                                    snapshot.data![
+                                                                            index]
+                                                                        [
+                                                                        'standId']]!
+                                                                .text),
+                                                            snapshot.data![
+                                                                    index]
+                                                                ['standName'])
+                                                        .then((msg) {
+                                                      setState(() {
+                                                        textEditingControllers[
+                                                                snapshot.data![
+                                                                        index][
+                                                                    'standId']]!
+                                                            .text = "1";
+                                                        var snackBar = SnackBar(
+                                                            duration:
+                                                                const Duration(
+                                                                    seconds: 2),
+                                                            content: Text(msg));
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                                snackBar);
+                                                      });
+                                                    });
+                                                  } else {
+                                                    var snackBar = SnackBar(
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 2),
+                                                        content: Text(
+                                                            "Total Melebihi Total Menu"));
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(snackBar);
+                                                  }
+                                                } else {
+                                                  var snackBar = SnackBar(
+                                                      duration: const Duration(
+                                                          seconds: 2),
+                                                      content: Text(
+                                                          "Total Tidak Boleh Dibawah 1"));
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(snackBar);
+                                                }
+                                              } else {
+                                                var snackBar = SnackBar(
+                                                    duration: const Duration(
+                                                        seconds: 2),
+                                                    content: Text(
+                                                        "Total Tidak Boleh Kosong"));
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(snackBar);
+                                              }
+                                            },
+                                            icon: Icon(Icons.add_shopping_cart),
+                                          ),
+                                        ],
+                                      )
                                     : const Text("Menu Habis"),
                               ),
                             ))));
-              },);
-          } else if(snapshot.hasError) {
+              },
+            );
+          } else if (snapshot.hasError) {
             return const Center(
               child: Text("Menu Yang Anda Cari Tidak Ada"),
             );
@@ -287,7 +348,8 @@ class _SearchResult extends State<SearchResult> {
               child: Text("Menu Yang Anda Cari Tidak Ada"),
             );
           }
-        },),
+        },
+      ),
     );
   }
 }
