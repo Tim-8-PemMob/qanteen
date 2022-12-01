@@ -19,7 +19,7 @@ class StandContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Container(
-        height: 270,
+        height: MediaQuery.of(context).size.height * 0.4,
         width: 200,
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(

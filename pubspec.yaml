@@ -46,12 +46,16 @@ dependencies:
   fluttertoast: ^8.1.1
   get: any
   google_fonts: any
+  image_gallery_saver: ^1.6.9
   image_picker: ^0.8.5+3
   intl: ^0.17.0
   open_file: ^3.2.1
   paginate_firestore: ^1.0.3+1
   path_provider: ^2.0.11
   pdf: ^3.8.3
+  permission_handler: ^8.1.1
+  screenshot: ^1.2.3
+  share_plus: ^2.1.4
   shared_preferences: ^2.0.15
 
 dev_dependencies:
