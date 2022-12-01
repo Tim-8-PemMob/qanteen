@@ -87,6 +87,13 @@ class _Nota extends State<Nota> {
     return listData;
   }
 
+  @override
+  void initState() {
+    super.initState();
+    getUserData();
+    initializeDateFormatting();
+  }
+
   void GeneratePDF(String pembeli, String menu) async {
     // final font = await rootBundle.load("assets/open-sans.ttf");
     // final ttf = pf.Font.ttf(font);
@@ -111,7 +118,7 @@ class _Nota extends State<Nota> {
         }));
 
     // simpan
-    Uint8List struk = await invoice.save();
+    final struk = await invoice.save();
 
     // buat file kosong di direktori
     final dir = await getApplicationDocumentsDirectory();
@@ -119,17 +126,9 @@ class _Nota extends State<Nota> {
 
     // timpa file kosong dengan file pdf
     await file.writeAsBytes(struk);
-
     // open pdf
     await OpenFile.open(file.path);
     // print("berhasil timpa");
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getUserData();
-    initializeDateFormatting();
   }
 
   @override
@@ -142,8 +141,7 @@ class _Nota extends State<Nota> {
           actions: [
             IconButton(
               onPressed: () async {
-                // getDetailOrder(timeOrder);
-                // GeneratePDF();
+                GeneratePDF("Test", "Menu");
               },
               icon: Icon(Icons.print_outlined),
             )
@@ -273,11 +271,11 @@ class _Nota extends State<Nota> {
                                                           ),
                                                           Expanded(
                                                             child: Text(
-                                                                "Rp. ${snapshot.data![index].totalHarga.toString()}"),
+                                                                "Rp. ${snapshot.data![index].hargaMenu.toString()}"),
                                                           ),
                                                           Expanded(
                                                             child: Text(
-                                                                "Rp. ${snapshot.data![index].totalHarga * snapshot.data![index].totalBeli}"),
+                                                                "Rp. ${snapshot.data![index].totalHarga}"),
                                                           ),
                                                         ],
                                                       ),

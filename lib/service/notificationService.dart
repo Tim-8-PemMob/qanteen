@@ -12,7 +12,7 @@ class NotificationService {
   static final _notificationService = FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
-    const AndroidInitializationSettings androidInitializationSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const AndroidInitializationSettings androidInitializationSettings = AndroidInitializationSettings('icon');
 
     final InitializationSettings settings = InitializationSettings(
       android: androidInitializationSettings,

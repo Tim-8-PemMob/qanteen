@@ -83,9 +83,7 @@ class _EditMenu extends State<EditMenu> {
     });
   }
 
-  Future<String> editMenu(
-      File? image, String standId, String oldImageURL, String menuId) async {
-    // jika gambar di ganti : upload gambar terlebih dahulu lalu ambil urlnya dan dimasukkan ke dalam db
+  Future<String> editMenu(File? image, String standId, String oldImageURL, String menuId) async {
     late String message;
     print("image null ?? : ${image}");
     print("old image : ${oldImage}");
@@ -332,7 +330,7 @@ class _EditMenu extends State<EditMenu> {
                           color: Colors.red[700],
                           child: Center(
                             child: const Text(
-                              "Input Menu",
+                              "Simpan Perubahan",
                               style: TextStyle(
                                 color: Colors.white,
                               ),

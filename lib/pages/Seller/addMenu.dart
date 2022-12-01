@@ -46,7 +46,6 @@ class _AddMenu extends State<AddMenu> {
   }
 
   String capitalizeAllWord(String value) {
-    // TODO: Test untuk huruf pertama atau setelah spasi harus besar dan huruf lainnya harus kecil
     var result = value[0].toUpperCase();
     for (int i = 1; i < value.length; i++) {
       if (value[i - 1] == " ") {

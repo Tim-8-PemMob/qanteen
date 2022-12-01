@@ -6,8 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qanteen/pages/login.dart';
 
-Future<String> signUp(
-    String name, String email, String password, String confirmPassword) async {
+Future<String> signUp(String name, String email, String password, String confirmPassword) async {
   final fcmToken = await FirebaseMessaging.instance.getToken();
   late UserCredential user;
   late String message;

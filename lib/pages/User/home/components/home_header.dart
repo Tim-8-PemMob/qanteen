@@ -87,7 +87,7 @@ class restaurantIcon extends StatelessWidget {
           color: kCupertinoModalBarrierColor.withOpacity(0.1),
           shape: BoxShape.circle),
       child: const FittedBox(
-        child: Icon(Icons.restaurant_menu),
+        child: ImageIcon(AssetImage('assets/Icon.png')),
       ),
     );
   }

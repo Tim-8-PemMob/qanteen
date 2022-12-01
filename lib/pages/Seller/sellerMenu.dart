@@ -115,69 +115,6 @@ class _SellerMenu extends State<SellerMenu> {
     return message;
   }
 
-  Future<void> reducePortion(
-      String standId, String menuId, int totalBuy) async {
-    await FirebaseFirestore.instance
-        .collection("Stands")
-        .doc(standId)
-        .collection("Menus")
-        .doc(menuId)
-        .update({
-      "total": FieldValue.increment(totalBuy * -1),
-    });
-  }
-
-  Future<String> addCart(
-      String standId, String menuId, int total, String standName) async {
-    // await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get();
-    final dbInstance = FirebaseFirestore.instance;
-    final prefs = await SharedPreferences.getInstance();
-    final String? userUid = prefs.getString("userUid");
-    late String message;
-    await dbInstance
-        .collection("Users")
-        .doc(userUid)
-        .collection("Cart")
-        .where("menuId", isEqualTo: menuId)
-        .get()
-        .then((data) async {
-      if (data.docs.isEmpty) {
-        await FirebaseFirestore.instance
-            .collection("Users")
-            .doc(userUid)
-            .collection("Cart")
-            .add({
-          "standId": standId,
-          "standName": standName,
-          "menuId": menuId,
-          "total": total,
-        }).then((msg) async {
-          await reducePortion(standId, menuId, total);
-          message = "Menu Di Tambahkan Ke Cart";
-        }, onError: (e) {
-          message = "Terjadi Masalah ${e}";
-        });
-      } else {
-        for (var doc in data.docs) {
-          await FirebaseFirestore.instance
-              .collection("Users")
-              .doc(userUid)
-              .collection("Cart")
-              .doc(doc.id)
-              .update({
-            "total": FieldValue.increment(total),
-          }).then((msg) async {
-            await reducePortion(standId, menuId, total);
-            message = "Menu Di Tambahkan Ke Cart";
-          }, onError: (e) {
-            message = "Terjadi Masalah ${e}";
-          });
-        }
-      }
-    });
-    return message;
-  }
-
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
   }

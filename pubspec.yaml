@@ -36,7 +36,6 @@ dependencies:
   cupertino_icons: any
   firebase_auth: ^3.10.0
   firebase_core: any
-  firebase_database: any
   firebase_messaging: ^13.1.0
   firebase_storage: ^10.3.8
   flutter:
@@ -52,9 +51,11 @@ dependencies:
   paginate_firestore: ^1.0.3+1
   path_provider: ^2.0.11
   pdf: ^3.8.3
+  pull_to_refresh: ^2.0.0
   shared_preferences: ^2.0.15
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.11.0
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter

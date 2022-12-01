@@ -129,31 +129,10 @@ class _myProfileState extends State<myProfile> {
                               shape: BoxShape.circle,
                               image: DecorationImage(
                                   fit: BoxFit.cover,
-                                  image: NetworkImage(
-                                      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=464&q=80')),
+                                  image: AssetImage("assets/profile.jpg"),
                             ),
                           ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border:
-                                      Border.all(width: 4, color: Colors.white),
-                                  color: Colors.blue),
-                              child: IconButton(
-                                icon: Icon(Icons.edit),
-                                onPressed: () {
-                                  print("edit");
-                                },
-                                color: Colors.white,
-                                padding: EdgeInsets.zero,
-                              ),
-                            ),
-                          ),
+                          )
                         ],
                       ),
                     ),
@@ -164,12 +143,6 @@ class _myProfileState extends State<myProfile> {
                             ? snapshot.data!['username']
                             : "...",
                         false, tUsername),
-                    buildTextField(
-                        "Email",
-                        (snapshot.data != null)
-                            ? snapshot.data!['email']
-                            : "...",
-                        false, null),
                     buildTextField("Password", "********", true, tPassword),
                     SizedBox(
                       height: 30,
@@ -177,22 +150,6 @@ class _myProfileState extends State<myProfile> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        OutlinedButton(
-                          onPressed: () {},
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(
-                                fontSize: 15,
-                                letterSpacing: 2,
-                                color: Colors.white),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 15),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20))),
-                        ),
                         ElevatedButton(
                           onPressed: () {
                             if(tPassword.text != "" || tUsername.text != "") {
@@ -206,7 +163,7 @@ class _myProfileState extends State<myProfile> {
                             }
                           },
                           child: Text(
-                            "SAVE",
+                            "Save Change",
                             style: TextStyle(
                               fontSize: 15,
                               letterSpacing: 2,
@@ -225,7 +182,7 @@ class _myProfileState extends State<myProfile> {
                       ],
                     ),
                     SizedBox(
-                      height: getProportionateScreenHeight(90),
+                      height: getProportionateScreenHeight(150),
                     ),
                     ElevatedButton(
                       onPressed: () {

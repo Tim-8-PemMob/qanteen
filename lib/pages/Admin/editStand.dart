@@ -200,7 +200,7 @@ class _EditStand extends State<EditStand> {
                           color: Colors.red[700],
                           child: Center(
                             child: const Text(
-                              "Input Menu",
+                              "Simpan Perubahan",
                               style: TextStyle(
                                 color: Colors.white,
                               ),

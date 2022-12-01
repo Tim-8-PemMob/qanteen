@@ -50,7 +50,6 @@ class _LoginPage extends State<LoginPage> {
         resMap['data'] = data;
       }
       resMap['res'] = message;
-      print(resMap);
     }
       return resMap;
   }

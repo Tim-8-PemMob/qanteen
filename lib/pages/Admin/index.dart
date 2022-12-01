@@ -6,6 +6,7 @@ import 'package:qanteen/pages/Admin/editStand.dart';
 import 'package:qanteen/model/stand_model.dart';
 import 'package:qanteen/pages/login.dart';
 import 'addSeller.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 Future<List<StandModel>> getStandFireStore() async {
   var listStand = List<StandModel>.empty(growable: true);
@@ -55,6 +56,19 @@ class Index extends StatefulWidget {
 }
 
 class _Index extends State<Index> {
+
+  RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
+
+  void _onRefresh() async{
+    // await getStandFireStore();
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+
+    });
+    _refreshController.refreshCompleted();
+  }
+
   @override
   Widget build(BuildContext context) {
     getStandFireStore();
@@ -98,96 +112,102 @@ class _Index extends State<Index> {
         ],
       ),
       body: FutureBuilder(
-        future: getStandFireStore(),
-        builder: (context, snapshot) {
-          var data = snapshot.data;
-          if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          } else if (data != null && data.isNotEmpty) {
-            // reference();
-            // addMenu();
-            return ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.outline,
+          future: getStandFireStore(),
+          builder: (context, snapshot) {
+            var data = snapshot.data;
+            if (snapshot.hasError) {
+              return Text(snapshot.error.toString());
+            } else if (data != null && data.isNotEmpty) {
+              // reference();
+              // addMenu();
+              return SmartRefresher (
+                  onRefresh: _onRefresh,
+                  enablePullDown: true,
+                  controller: _refreshController,
+                  header: WaterDropHeader(),
+                  child : ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                          borderRadius:
+                          const BorderRadius.all(Radius.circular(12)),
                         ),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(12)),
-                      ),
-                      child: InkWell(
-                          child: SizedBox(
-                              height: 80,
-                              child: Center(
-                                  child: ListTile(
-                                leading: const Icon(Icons.food_bank),
-                                title: Text(data[index].name.toString()),
-                                trailing: PopupMenuButton<int>(
-                                    onSelected: (value) async {
-                                      if (value == 1) {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (builder) => EditStand(
-                                                    standId: data[index]
-                                                        .id))).then((msg) =>
-                                            setState(() {
-                                              var snackBar =
-                                                  SnackBar(content: Text(msg));
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(snackBar);
-                                            }));
-                                      } else if (value == 2) {
-                                        showDialog<String>(
-                                          context: context,
-                                          builder: (BuildContext context) => AlertDialog(
-                                            title: const Text('Delete'),
-                                            content: const Text('Delete ?'),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(context, 'Cancel'),
-                                                child: const Text('Cancel'),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  deleteStandById(data[index].id)
-                                                      .then((msg) {
-                                                    setState(() {
-                                                      var snackBar =
-                                                      SnackBar(content: Text(msg));
-                                                      ScaffoldMessenger.of(context)
-                                                          .showSnackBar(snackBar);
-                                                    });
-                                                  });
-                                                },
-                                                child: const Text('Delete'),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    itemBuilder: (BuildContext context) =>
-                                        <PopupMenuEntry<int>>[
-                                          const PopupMenuItem<int>(
-                                              value: 1,
-                                              child: const Text("Edit")),
-                                          const PopupMenuItem<int>(
-                                              value: 2,
-                                              child: const Text("Delete")),
-                                        ]),
-                              )))));
-                });
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            return const Center(child: Text("Stands Makanan Kosong"));
-          }
-        },
-      ),
+                        child: InkWell(
+                            child: SizedBox(
+                                height: 80,
+                                child: Center(
+                                    child: ListTile(
+                                      leading: const Icon(Icons.food_bank),
+                                      title: Text(data[index].name.toString()),
+                                      trailing: PopupMenuButton<int>(
+                                          onSelected: (value) async {
+                                            if (value == 1) {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (builder) => EditStand(
+                                                          standId: data[index]
+                                                              .id))).then((msg) =>
+                                                  setState(() {
+                                                    var snackBar =
+                                                    SnackBar(content: Text(msg));
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(snackBar);
+                                                  }));
+                                            } else if (value == 2) {
+                                              showDialog<String>(
+                                                context: context,
+                                                builder: (BuildContext context) => AlertDialog(
+                                                  title: const Text('Delete'),
+                                                  content: const Text('Delete ?'),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                                                      child: const Text('Cancel'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        deleteStandById(data[index].id)
+                                                            .then((msg) {
+                                                          setState(() {
+                                                            var snackBar =
+                                                            SnackBar(content: Text(msg));
+                                                            ScaffoldMessenger.of(context)
+                                                                .showSnackBar(snackBar);
+                                                          });
+                                                        });
+                                                        Navigator.pop(context, 'Cancel');
+                                                      },
+                                                      child: const Text('Delete'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          itemBuilder: (BuildContext context) =>
+                                          <PopupMenuEntry<int>>[
+                                            const PopupMenuItem<int>(
+                                                value: 1,
+                                                child: const Text("Edit")),
+                                            const PopupMenuItem<int>(
+                                                value: 2,
+                                                child: const Text("Delete")),
+                                          ]),
+                                    )))));
+                  }));
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else {
+              return const Center(child: Text("Stands Makanan Kosong"));
+            }
+          },
+        ),
     );
   }
 }

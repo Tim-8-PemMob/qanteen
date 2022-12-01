@@ -112,7 +112,6 @@ class _Menu extends State<Menu> {
   }
 
   Future<String> addCart(String standId, String menuId, int total, String standName) async {
-    // await FirebaseFirestore.instance.collection("Stands").doc(standId).collection("Menus").doc(menuId).get();
     final dbInstance = FirebaseFirestore.instance;
     final prefs = await SharedPreferences.getInstance();
     final String? userUid = prefs.getString("userUid");

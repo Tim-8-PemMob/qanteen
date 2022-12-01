@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class AddSeller extends StatefulWidget {
   @override
@@ -336,7 +337,7 @@ class _AddSeller extends State<AddSeller> {
                           color: Colors.red[700],
                           child: Center(
                             child: const Text(
-                              "Input Menu",
+                              "Input Stand",
                               style: TextStyle(
                                 color: Colors.white,
                               ),
