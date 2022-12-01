@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddMenu extends StatefulWidget {
@@ -240,20 +241,14 @@ class _AddMenu extends State<AddMenu> {
                               tTotal.text.isNotEmpty &&
                               image != null) {
                             inputMenu(standId, image!).then((msg) {
-                              var snackBar = SnackBar(content: Text(msg));
                               if (msg == "Menu Berhasil di Tambahkan") {
                                 Navigator.pop(context, msg);
                               } else {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                                Fluttertoast.showToast(msg: msg);
                               }
                             });
                           } else {
-                            var snackBar = SnackBar(
-                                content:
-                                    Text("Tolong Masukkan Data Dengan Benar"));
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
+                            Fluttertoast.showToast(msg: "Tolong Masukkan Data Dengan Benar");
                           }
                         },
                         child: ClipRRect(

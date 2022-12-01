@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -309,24 +310,18 @@ class _AddSeller extends State<AddSeller> {
                           addSeller(tName.text, tEmail.text, tPassword.text,
                                   tConfirmPassword.text)
                               .then((msg) {
-                            var snackBar = SnackBar(content: Text(msg));
-                            if (msg ==
-                                "Email dan Stand berhasil di tambahkan") {
+                            if (msg == "Email dan Stand berhasil di tambahkan") {
                               setState(() {
                                 tName.text = "";
                                 tEmail.text = "";
                                 tPassword.text = "";
                                 tConfirmPassword.text = "";
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                                Fluttertoast.showToast(msg: msg);
                               });
                             }
                           });
                         } else {
-                          var snackBar = SnackBar(
-                              content:
-                                  Text("Tolong Masukkan Data Dengan Benar"));
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          Fluttertoast.showToast(msg: "Tolong Masukkan Data Dengan Benar");
                         }
                       },
                       child: ClipRRect(

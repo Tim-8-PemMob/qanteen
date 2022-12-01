@@ -9,6 +9,7 @@ import 'package:qanteen/pages/Seller/editMenu.dart';
 import 'package:qanteen/pages/Seller/standOrder.dart';
 import 'package:qanteen/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SellerMenu extends StatefulWidget {
   final String standId;
@@ -133,6 +134,16 @@ class _SellerMenu extends State<SellerMenu> {
     await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
       'fcmToken' : "",
     });
+  }
+
+  Future<String> deleteUser() async {
+    late String message;
+    await FirebaseAuth.instance.currentUser!.delete().then((res) {
+      message = "Berhasil Hapus Akun";
+    }, onError: (e) {
+      message = e.message.toString();
+    });
+    return message;
   }
 
   @override
@@ -287,10 +298,7 @@ class _SellerMenu extends State<SellerMenu> {
                                                     deleteMenu(standId, data[index].id)
                                                         .then((msg) {
                                                       setState(() {
-                                                        var snackBar =
-                                                        SnackBar(content: Text(msg));
-                                                        ScaffoldMessenger.of(context)
-                                                            .showSnackBar(snackBar);
+                                                        Fluttertoast.showToast(msg: msg);
                                                       });
                                                     });
                                                     Navigator.pop(context);
@@ -324,8 +332,44 @@ class _SellerMenu extends State<SellerMenu> {
             );
           }
         },
-      ) : const Center(
-        child: Text("Stand Anda Telah Di Hapus Silahkan Hubungi Admin"),
+      ) : Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Stand Anda Telah Di Hapus Silahkan Hubungi Admin"),
+            Text("Atau"),
+            TextButton(
+              onPressed: () {
+                showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Hapus Akun'),
+                    content: const Text('Apakah anda yakin akan menghapus akun anda ?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, 'Cancel'),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          deleteUser().then((res) {
+                            if(res == "Berhasil Hapus Akun") {
+                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false);
+                            } else {
+                              Fluttertoast.showToast(msg: res);
+                            }
+                          });
+                        },
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: Text("Hapus Akun"),
+            )
+          ],
+        ),
       ),
       floatingActionButton: (standExist)? FloatingActionButton(
         backgroundColor: Colors.red[700],

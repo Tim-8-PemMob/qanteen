@@ -1,35 +1,37 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class EditStand extends StatefulWidget {
-  final String standId;
-
-  EditStand({required this.standId});
+class AddStand extends StatefulWidget {
+  final String userUid;
+  AddStand({required this.userUid});
 
   @override
-  _EditStand createState() => _EditStand(standId: standId);
+  _AddStand createState() => _AddStand(userUid: userUid);
 }
 
-class _EditStand extends State<EditStand> {
-  final String standId;
-
-  _EditStand({required this.standId});
+class _AddStand extends State<AddStand> {
+  final String userUid;
+  _AddStand({required this.userUid});
 
   TextEditingController tName = TextEditingController(text: "");
+  TextEditingController tEmail = TextEditingController(text: "");
+  TextEditingController tPassword = TextEditingController(text: "");
+  TextEditingController tConfirmPassword = TextEditingController(text: "");
+
   final ImagePicker imagePicker = ImagePicker();
   File? image;
-  String oldImage = "";
-  String oldImgName = "";
 
   Future getImagePath() async {
     final pickedImg = await imagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
       image = File(pickedImg!.path);
-      oldImage = "";
     });
   }
 
@@ -46,71 +48,51 @@ class _EditStand extends State<EditStand> {
     return downloadUrl;
   }
 
-  Future getStandById(String standId) async {
+  Future<String> addStand() async {
+    late String standId;
     await FirebaseFirestore.instance
-        .collection('Stands')
-        .doc(standId)
-        .get()
-        .then((data) {
-      var stand = data.data();
-      if (stand != null) {
-        setState(() {
-          tName = TextEditingController(text: stand['name'].toString());
-          oldImage = stand['image'];
-        });
-      }
-    });
-  }
-
-  Future<String> editStand(
-      File? image, String standId, String oldImageUrl) async {
-    late String message;
-
-    if (oldImage == "") {
-      await fileUpload(image!, standId).then((url) async {
+        .collection("Stands")
+        .add({"name": tName.text.toString()}).then((res) async {
+      await fileUpload(image!, res.id).then((url) async {
         await FirebaseFirestore.instance
             .collection("Stands")
-            .doc(standId)
-            .update({
-          "name": tName.text,
-          "image": url,
+            .doc(res.id)
+            .update({"image": url});
+      });
+      standId = res.id;
+    });
+    return standId;
+  }
+
+  Future<String> newStands(String name, String userUid) async {
+    late String message;
+    try {
+      await FirebaseFirestore.instance.collection("Users").doc(userUid).update({
+          "name": name,
+          "role": "seller",
+          'standId': await addStand(),
+        }).then((value) {
+          message = "Stand Berhasil Ditambahkan";
+        }, onError: (e) {
+          message = "Terjadi kesalahan ${e}";
         });
-        message = "Stand Berhasil Di Edit";
-      }, onError: (e) {
-        message = "Terjadi Masalah ${e}";
-      });
-    } else {
-      await FirebaseFirestore.instance
-          .collection("Stands")
-          .doc(standId)
-          .update({
-        "name": tName.text,
-        "image": oldImageUrl,
-      }).then((res) {
-        message = "Stand Berhasil Di Edit";
-      }, onError: (e) {
-        message = "Terjadi Masalah ${e}";
-      });
+    } catch (e) {
+      print(e);
     }
     return message;
   }
 
   @override
-  void initState() {
-    super.initState();
-    getStandById(standId);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    var img = image;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.red[700],
-        title: const Text("Edit Stands"),
+        title: const Text("Add Stand"),
       ),
       body: SingleChildScrollView(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.4),
         child: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Center(
@@ -122,7 +104,7 @@ class _EditStand extends State<EditStand> {
                     IconButton(
                         onPressed: () => getImagePath(),
                         icon: const Icon(Icons.image)),
-                    (oldImage == "" && img != null)
+                    (image != null)
                         ? Container(
                             margin: EdgeInsets.only(
                               bottom: MediaQuery.of(context).size.height / 20,
@@ -130,23 +112,11 @@ class _EditStand extends State<EditStand> {
                             child: Image(
                                 height: MediaQuery.of(context).size.height / 5,
                                 width: MediaQuery.of(context).size.height,
-                                image: FileImage(img)),
+                                image: FileImage(image!)),
                           )
-                        : (oldImage == "" && img == null)
-                            ? const CircularProgressIndicator()
-                            : Container(
-                                margin: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).size.height / 20,
-                                ),
-                                child: Image(
-                                    height:
-                                        MediaQuery.of(context).size.height / 5,
-                                    width: MediaQuery.of(context).size.height,
-                                    image: NetworkImage(oldImage)),
-                              ),
+                        : const Text("Image is Empty"),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 50, top: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: TextField(
                         controller: tName,
                         decoration: const InputDecoration(
@@ -177,19 +147,26 @@ class _EditStand extends State<EditStand> {
                             child: Icon(Icons.food_bank_outlined,
                                 color: Colors.black),
                           ),
-                          hintText: "Nama Stand Anda",
-                          labelText: "Nama Baru Stand Anda",
+                          hintText: "Masukkan Nama Stand",
+                          labelText: "Nama Stand",
                         ),
                       ),
                     ),
                     TextButton(
-                      onPressed: () async => editStand(img, standId, oldImage).then((msg) {
-                        if (msg == "Stand Berhasil Di Edit") {
-                          Navigator.pop(context, msg);
+                      onPressed: () {
+                        if (tName.text.isNotEmpty && image != null) {
+                          newStands(tName.text, userUid).then((msg) {
+                            if (msg == "Stand Berhasil Ditambahkan") {
+                              setState(() {
+                                tName.text = "";
+                                Fluttertoast.showToast(msg: msg);
+                              });
+                            }
+                          });
                         } else {
-                          Fluttertoast.showToast(msg: msg);
+                          Fluttertoast.showToast(msg: "Tolong Masukkan Data Dengan Benar");
                         }
-                      }),
+                      },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Container(
@@ -198,7 +175,7 @@ class _EditStand extends State<EditStand> {
                           color: Colors.red[700],
                           child: Center(
                             child: const Text(
-                              "Simpan Perubahan",
+                              "Input Stand",
                               style: TextStyle(
                                 color: Colors.white,
                               ),

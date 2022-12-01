@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -313,12 +314,10 @@ class _EditMenu extends State<EditMenu> {
                     TextButton(
                       onPressed: () {
                         editMenu(img, standId, oldImage, menuId).then((msg) {
-                          var snackBar = SnackBar(content: Text(msg));
                           if (msg == "Menu Berhasil di Edit") {
                             Navigator.pop(context, msg);
                           } else {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
+                            Fluttertoast.showToast(msg: msg);
                           }
                         });
                       },

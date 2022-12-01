@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,13 +10,16 @@ import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pf;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qanteen/model/nota_model.dart';
 import 'package:qanteen/pages/User/nota/folder_clipper.dart';
 import 'package:qanteen/pages/User/nota/invoice_clipper.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 class Nota extends StatefulWidget {
   final Timestamp timeOrder;
@@ -29,6 +33,8 @@ class _Nota extends State<Nota> {
   final Timestamp timeOrder;
   _Nota({required this.timeOrder});
 
+  ScreenshotController screenshotController = ScreenshotController();
+
   int hargaAkhir = 0;
   String? emailUser;
 
@@ -36,6 +42,34 @@ class _Nota extends State<Nota> {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       emailUser = user?.email;
     });
+  }
+
+  Future<String> saveImage(Uint8List bytes) async {
+    await [Permission.storage].request();
+
+    final time = DateTime.now()
+        .toIso8601String()
+        .replaceAll('.', '-')
+        .replaceAll(':', '-');
+    final name = 'qanteen_nota_$time';
+
+    final result = await ImageGallerySaver.saveImage(bytes, name: name);
+    // await OpenFile.open('coba');
+
+    return result['filePath'];
+  }
+
+  Future saveAndShare(Uint8List bytes) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final time = DateTime.now()
+        .toIso8601String()
+        .replaceAll('.', '-')
+        .replaceAll(':', '-');
+    final image = File('${directory.path}/qanteen_nota_$time.jpg');
+    image.writeAsBytesSync(bytes);
+
+    // await Share.shareFiles([image.path]);
+    await OpenFile.open(image.path);
   }
 
   String formatTime(Timestamp time) {
@@ -134,117 +168,124 @@ class _Nota extends State<Nota> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Nota"),
-          centerTitle: true,
-          backgroundColor: Colors.red[700],
-          actions: [
-            IconButton(
-              onPressed: () async {
-                GeneratePDF("Test", "Menu");
-              },
-              icon: Icon(Icons.print_outlined),
-            )
-          ],
-        ),
-        body: SingleChildScrollView(
+      appBar: AppBar(
+        title: Text("Nota"),
+        centerTitle: true,
+        backgroundColor: Colors.red[700],
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final image = await screenshotController.capture();
+              if (image == null) return;
+
+              await saveImage(image);
+
+              saveAndShare(image);
+            },
+            icon: Icon(Icons.print_outlined),
+          )
+        ],
+      ),
+      body: Screenshot(
+        controller: screenshotController,
+        child: SingleChildScrollView(
             child: Container(
-              margin: EdgeInsets.all(10),
-              child: FutureBuilder(
-                future: getDetailOrder(timeOrder),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: ClipPath(
-                          clipper: FolderClipper(),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                            padding: EdgeInsets.only(top: 24),
-                            color: Color(0XFFEAE7EA),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+          margin: EdgeInsets.all(10),
+          child: FutureBuilder(
+            future: getDetailOrder(timeOrder),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: ClipPath(
+                      clipper: FolderClipper(),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        padding: EdgeInsets.only(top: 24),
+                        color: Color(0XFFEAE7EA),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildHeader(
+                              pengguna: "${snapshot.data![0].userName}",
+                            ),
+                            _buildAtasStruk(),
+                            Column(
                               children: [
-                                _buildHeader(
-                                  pengguna: "${snapshot.data![0].userName}",
-                                ),
-                                _buildAtasStruk(),
-                                Column(
-                                  children: [
-                                    ClipPath(
-                                      clipper: InvoiceContentClipper(),
-                                      child: Container(
-                                        color: Colors.white,
-                                        padding: EdgeInsets.all(24),
-                                        child: Column(
+                                ClipPath(
+                                  clipper: InvoiceContentClipper(),
+                                  child: Container(
+                                    color: Colors.white,
+                                    padding: EdgeInsets.all(24),
+                                    child: Column(
+                                      children: [
+                                        Row(
                                           children: [
-                                            Row(
-                                              children: [
-                                                Icon(Icons.file_copy),
-                                                Text(
-                                                  "Detail Nota",
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyLarge!
-                                                      .copyWith(
+                                            Icon(Icons.file_copy),
+                                            Text(
+                                              "Detail Nota",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge!
+                                                  .copyWith(
                                                       color: Colors.black),
-                                                ),
-                                              ],
                                             ),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
                                                     CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        "Email Pengguna",
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .caption,
-                                                      ),
-                                                      const SizedBox(height: 4),
-                                                      Text(emailUser ?? ""),
-                                                    ],
+                                                children: [
+                                                  Text(
+                                                    "Email Pengguna",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .caption,
                                                   ),
-                                                ),
-                                                Container(
-                                                  width: .5,
-                                                  color: Colors.black38,
-                                                  height: 50,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    alignment:
-                                                    Alignment.centerRight,
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text(
-                                                          "Tanggal Struk",
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .caption,
-                                                        ),
-                                                        SizedBox(height: 4),
-                                                        Text(formatTime(timeOrder)),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
+                                                  const SizedBox(height: 4),
+                                                  Text(emailUser ?? ""),
+                                                ],
+                                              ),
                                             ),
                                             Container(
-                                              width: double.infinity,
-                                              height: .4,
-                                              color: Colors.black,
-                                              margin: EdgeInsets.symmetric(
-                                                  vertical: 20),
+                                              width: .5,
+                                              color: Colors.black38,
+                                              height: 50,
                                             ),
+                                            Expanded(
+                                              child: Container(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Tanggal Struk",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .caption,
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Text(formatTime(timeOrder)),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        Container(
+                                          width: double.infinity,
+                                          height: .4,
+                                          color: Colors.black,
+                                          margin: EdgeInsets.symmetric(
+                                              vertical: 20),
+                                        ),
                                             Column(
                                               children: [
                                                 ListView.builder(
@@ -293,54 +334,56 @@ class _Nota extends State<Nota> {
                                                   mainAxisAlignment:
                                                   MainAxisAlignment
                                                       .spaceBetween,
-                                                  children: [
-                                                    Expanded(child: Text("Total")),
-                                                    Container(
-                                                      width: MediaQuery.of(context)
+                                              children: [
+                                                Expanded(child: Text("Total")),
+                                                Container(
+                                                  width: MediaQuery.of(context)
                                                           .size
                                                           .width *
-                                                          0.1,
-                                                      child: Text(""),
-                                                    ),
-                                                    Expanded(
-                                                      child: Text(""),
-                                                    ),
-                                                    Expanded(
-                                                      child: Text("Rp. ${countTotalPrice(listCart)}"),
-                                                    )
-                                                  ],
+                                                      0.1,
+                                                  child: Text(""),
+                                                ),
+                                                Expanded(
+                                                  child: Text(""),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                      "Rp. ${countTotalPrice(listCart)}"),
                                                 )
                                               ],
-                                            ),
+                                            )
                                           ],
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text("Terjadi Error"),
-                    );
-                  } else if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    return Center(
-                      child: Text("Empty"),
-                    );
-                  }
-                },
-              ),
-            )),
-            );
+                    ),
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text("Terjadi Error"),
+                );
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                return Center(
+                  child: Text("Empty"),
+                );
+              }
+            },
+          ),
+        )),
+      ),
+    );
   }
 }
 

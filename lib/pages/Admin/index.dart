@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:qanteen/pages/Admin/allUser.dart';
 import 'package:qanteen/pages/Admin/editStand.dart';
 import 'package:qanteen/model/stand_model.dart';
 import 'package:qanteen/pages/login.dart';
@@ -28,11 +30,7 @@ Future<void> signOut() async {
 
 Future<String> deleteStandById(String standId) async {
   late String message;
-  await FirebaseFirestore.instance
-      .collection("Stands")
-      .doc(standId)
-      .delete()
-      .then((res) {
+  await FirebaseFirestore.instance.collection("Stands").doc(standId).delete().then((res) {
     deleteStandStorage(standId);
     message = "Stand Berhasil Di Hapus";
   }, onError: (e) {
@@ -105,6 +103,13 @@ class _Index extends State<Index> {
           IconButton(
             onPressed: () {
               Navigator.push(context,
+                  MaterialPageRoute(builder: (builder) => AllUser()));
+            },
+            icon: const Icon(Icons.people),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(context,
                   MaterialPageRoute(builder: (builder) => AddSeller()));
             },
             icon: const Icon(Icons.add),
@@ -124,7 +129,6 @@ class _Index extends State<Index> {
                   onRefresh: _onRefresh,
                   enablePullDown: true,
                   controller: _refreshController,
-                  header: WaterDropHeader(),
                   child : ListView.builder(
                   itemCount: data.length,
                   itemBuilder: (context, index) {
@@ -154,10 +158,7 @@ class _Index extends State<Index> {
                                                           standId: data[index]
                                                               .id))).then((msg) =>
                                                   setState(() {
-                                                    var snackBar =
-                                                    SnackBar(content: Text(msg));
-                                                    ScaffoldMessenger.of(context)
-                                                        .showSnackBar(snackBar);
+                                                    Fluttertoast.showToast(msg: msg);
                                                   }));
                                             } else if (value == 2) {
                                               showDialog<String>(
@@ -175,10 +176,7 @@ class _Index extends State<Index> {
                                                         deleteStandById(data[index].id)
                                                             .then((msg) {
                                                           setState(() {
-                                                            var snackBar =
-                                                            SnackBar(content: Text(msg));
-                                                            ScaffoldMessenger.of(context)
-                                                                .showSnackBar(snackBar);
+                                                            Fluttertoast.showToast(msg: msg);
                                                           });
                                                         });
                                                         Navigator.pop(context, 'Cancel');
